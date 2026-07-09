@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wariguard-web",
+      "runtimeExecutable": "flutter",
+      "runtimeArgs": ["run", "-d", "web-server", "--web-port", "5317"],
+      "cwd": "frontend",
+      "port": 5317
+    },
+    {
+      "name": "wariguard-web-release",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5318", "--directory", "frontend/build/web"],
+      "port": 5318
+    }
+  ]
+}

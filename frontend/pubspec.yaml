@@ -1,0 +1,38 @@
+name: wariguard
+description: "WariGuard — bouclier IA contre les arnaques Mobile Money (Hackathon IA & Mobile Money Afrique 2026, ClaPay SA)."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  shared_preferences: ^2.3.3
+  http: ^1.2.2
+  encrypt: ^5.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/data/dataset_wariguard.json
+
+  fonts:
+    - family: Sora
+      fonts:
+        - asset: assets/fonts/Sora-Variable.ttf
+    - family: IBM Plex Mono
+      fonts:
+        - asset: assets/fonts/IBMPlexMono-Regular.ttf
+        - asset: assets/fonts/IBMPlexMono-SemiBold.ttf
+          weight: 600
