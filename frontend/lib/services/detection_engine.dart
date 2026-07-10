@@ -100,7 +100,8 @@ const Map<ScamType, String> _recommendations = {
       "Ignorez ce message. Aucun gain légitime n'exige de frais ou de code pour être « débloqué ».",
   ScamType.transfertErrone:
       "Ne renvoyez rien. Vérifiez votre solde réel dans l'application officielle avant toute action.",
-  ScamType.phishingLien: "N'ouvrez pas ce lien. Vérifiez-le d'abord avec Link Shield.",
+  ScamType.phishingLien:
+      "N'ouvrez pas ce lien. Le Bouclier Lien l'a bloqué avant tout chargement.",
   ScamType.aucun: "Aucune action requise. Restez vigilant sur les demandes de code ou d'argent.",
 };
 

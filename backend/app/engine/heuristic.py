@@ -86,7 +86,7 @@ RECOMMENDATIONS: dict[ScamType, str] = {
     ScamType.FAUX_AGENT: "Raccrochez / ne répondez pas. Un opérateur ne demande JAMAIS votre code. Appelez vous-même le service client officiel.",
     ScamType.FAUX_GAIN: "Ignorez ce message. Aucun gain légitime n'exige de frais ou de code pour être « débloqué ».",
     ScamType.TRANSFERT_ERRONE: "Ne renvoyez rien. Vérifiez votre solde réel dans l'application officielle avant toute action.",
-    ScamType.PHISHING_LIEN: "N'ouvrez pas ce lien. Vérifiez-le d'abord avec Link Shield.",
+    ScamType.PHISHING_LIEN: "N'ouvrez pas ce lien. Le Bouclier Lien l'a bloqué avant tout chargement.",
     ScamType.AUCUN: "Aucune action requise. Restez vigilant sur les demandes de code ou d'argent.",
 }
 
