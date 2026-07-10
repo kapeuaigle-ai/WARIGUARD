@@ -51,7 +51,10 @@ class _RootState extends State<_Root> {
     if (state.settings.onboarded) {
       child = const AppShell();
     } else if (_permissionsStep) {
-      child = const Scaffold(backgroundColor: Wg.bg, body: PermissionsScreen());
+      child = const Scaffold(
+        backgroundColor: Wg.bg,
+        body: SafeArea(child: PermissionsScreen()),
+      );
     } else {
       child = Scaffold(
         backgroundColor: Wg.bg,

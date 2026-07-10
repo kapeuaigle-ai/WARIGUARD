@@ -50,13 +50,15 @@ class _AppShellState extends State<AppShell> {
     final scaffold = Scaffold(
       backgroundColor: Wg.bg,
       body: IndexedStack(index: _index, children: screens),
+      // La barre de gestes Android ne doit pas traverser les libellés.
       bottomNavigationBar: Container(
-        height: 66,
         decoration: const BoxDecoration(
           color: Colors.white,
           border: Border(top: BorderSide(color: Wg.borderSofter)),
         ),
-        padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
+        padding: EdgeInsets.fromLTRB(
+            6, 0, 6, 6 + MediaQuery.viewPaddingOf(context).bottom),
+        height: 66 + MediaQuery.viewPaddingOf(context).bottom,
         child: Row(
           children: [
             _NavItem(
