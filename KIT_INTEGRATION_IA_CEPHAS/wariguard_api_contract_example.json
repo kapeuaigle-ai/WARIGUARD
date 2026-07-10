@@ -1,0 +1,29 @@
+{
+  "score_risque": 0.9021,
+  "niveau_alerte": "rouge",
+  "label": "arnaque",
+  "type_scenario": "T1",
+  "type_arnaque": "Faux agent Mobile Money",
+  "confiance_type": 0.579,
+  "mots_declencheurs": [
+    "agent",
+    "compte",
+    "message recu",
+    "wave"
+  ],
+  "probabilite_ml_arnaque": 0.8021,
+  "bonus_regles": 0.1,
+  "probabilites_binaires": {
+    "arnaque": 0.8021,
+    "legitime": 0.1979
+  },
+  "probabilites_types": {
+    "Faux agent Mobile Money": 0.579,
+    "Faux transfert erroné": 0.0852,
+    "Faux gain / loterie": 0.0929,
+    "Phishing / faux lien officiel": 0.0616,
+    "Usurpation d'urgence familiale": 0.1168,
+    "Fausse promotion opérateur": 0.0644
+  },
+  "message_utilisateur": "🔴 Alerte élevée (90%)\nCette communication présente de forts signes d'arnaque.\nType détecté : Faux agent Mobile Money.\nConseil : ne communiquez aucun code et ne transférez pas d'argent."
+}
