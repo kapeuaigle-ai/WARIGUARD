@@ -45,7 +45,7 @@ class _Root extends StatelessWidget {
       builder: (context, constraints) {
         if (constraints.maxWidth < 560) return child;
         return ColoredBox(
-          color: Wg.bgDeep,
+          color: const Color(0xFFECEDEE),
           child: Center(
             child: Container(
               width: 430,
@@ -53,17 +53,22 @@ class _Root extends StatelessWidget {
               margin: const EdgeInsets.symmetric(vertical: 24),
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(36),
-                border: Border.all(color: Wg.borderHi, width: 1.5),
+                color: const Color(0xFF111315),
+                borderRadius: BorderRadius.circular(54),
                 boxShadow: [
                   BoxShadow(
-                    color: Wg.teal.withValues(alpha: 0.08),
-                    blurRadius: 80,
-                    spreadRadius: 8,
+                    color: Colors.black.withValues(alpha: 0.18),
+                    blurRadius: 60,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 18),
                   ),
                 ],
               ),
-              child: child,
+              padding: const EdgeInsets.all(12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(42),
+                child: child,
+              ),
             ),
           ),
         );
@@ -78,14 +83,19 @@ class _Splash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
+      backgroundColor: Wg.bg,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ShieldMark(size: 64),
+            ShieldMark(size: 72),
             SizedBox(height: 20),
-            Text('WariGuard',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+            Text('WARIGUARD',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2.5,
+                    color: Wg.green)),
             SizedBox(height: 8),
             Text('Chargement du bouclier…', style: TextStyle(color: Wg.textDim)),
           ],

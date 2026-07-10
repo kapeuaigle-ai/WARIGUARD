@@ -45,7 +45,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.fact_check_rounded, color: Wg.teal, size: 22),
+                      const Icon(Icons.fact_check_rounded, color: Wg.green, size: 22),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -121,7 +121,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Wg.bgDeep,
+                        color: const Color(0xFF12181C),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -134,7 +134,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Wg.bgDeep,
+                        color: const Color(0xFF12181C),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Wg.border),
                       ),
@@ -152,7 +152,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
                             style: monoStyle.copyWith(
                               fontSize: 10.5,
                               height: 1.55,
-                              color: _showDecrypted ? Wg.green : Wg.cyan,
+                              color: _showDecrypted
+                                  ? const Color(0xFF7BE3A8)
+                                  : const Color(0xFF8FD3F4),
                             ),
                           ),
                         ],
@@ -302,7 +304,7 @@ class _EngineOption extends StatelessWidget {
             selected ? Icons.radio_button_checked : Icons.radio_button_off,
             size: 19,
             color: selected
-                ? Wg.teal
+                ? Wg.green
                 : enabled
                     ? Wg.textDim
                     : Wg.textFaint,
@@ -344,7 +346,7 @@ class _ThreatRow extends StatelessWidget {
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            color: Wg.bgDeep,
+            color: Wg.surfaceAlt,
             borderRadius: BorderRadius.circular(11),
           ),
           child: Icon(icon, size: 18, color: Wg.orange),
@@ -359,7 +361,7 @@ class _ThreatRow extends StatelessWidget {
               const SizedBox(height: 2),
               Row(
                 children: [
-                  const Icon(Icons.shield_rounded, size: 11, color: Wg.teal),
+                  const Icon(Icons.shield_rounded, size: 11, color: Wg.green),
                   const SizedBox(width: 5),
                   Expanded(
                     child: Text(defense,

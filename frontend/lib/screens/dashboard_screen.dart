@@ -1,5 +1,6 @@
-/// Tableau de bord : état de la protection, chiffres réels du moteur
-/// (précision / rappel mesurés sur le dataset embarqué) et historique.
+/// Accueil — layout exact du prototype : hero « Protection active » vert pâle
+/// avec interrupteur, cartes statistiques, bouton pointillé « Simuler un appel
+/// suspect », complété par les chiffres réels du moteur (exigence MVP).
 library;
 
 import 'package:flutter/material.dart';
@@ -8,141 +9,215 @@ import 'package:provider/provider.dart';
 import '../models.dart';
 import '../services/app_state.dart';
 import '../theme.dart';
+import '../widgets/alert_sheet.dart';
 import '../widgets/common.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
+  Future<void> _simulateCall(BuildContext context) async {
+    final state = context.read<AppState>();
+    if (!state.protectionActive) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Activez d\'abord la protection.'),
+      ));
+      return;
+    }
+    final scenario = state.dataset.examples
+        .firstWhere((e) => e.label == ScamType.fauxAgent && e.channel == MessageChannel.appel);
+    final result = await state.analyzeText(scenario.text, scenario.channel);
+    if (!context.mounted) return;
+    await AlertSheet.show(
+      context,
+      result: result,
+      channel: scenario.channel,
+      sourceLabel: 'Appel en cours · « Agent Wave — vérification »',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
-    final theme = Theme.of(context);
     final metrics = state.metrics;
+    final active = state.protectionActive;
+    final last = state.history.isEmpty ? null : state.history.first.timestamp;
+    final lastLabel = last == null
+        ? '—'
+        : '${last.hour.toString().padLeft(2, '0')}:${last.minute.toString().padLeft(2, '0')}';
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(0.9, -1.1),
-            radius: 1.5,
-            colors: [Color(0xFF0B2C42), Wg.bg],
-          ),
-        ),
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-            children: [
-              // ---- En-tête ----
-              Row(
+      backgroundColor: Wg.bg,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+          children: [
+            // ---- En-tête (logo + nom, comme le prototype) ----
+            const Row(
+              children: [
+                ShieldMark(size: 34),
+                SizedBox(width: 10),
+                Text('WariGuard',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              ],
+            ),
+            const SizedBox(height: 18),
+
+            // ---- Hero « Protection active » ----
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+              decoration: BoxDecoration(
+                color: active ? Wg.greenTint : Wg.surfaceAlt,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Column(
                 children: [
-                  const ShieldMark(),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('WariGuard', style: theme.textTheme.titleLarge),
-                      Text(
-                        state.protectionActive
-                            ? 'Protection ${state.consent.mode == ConsentMode.permanent ? "permanente" : "à la demande"}'
-                            : 'Protection désactivée',
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: state.protectionActive ? Wg.green : Wg.red),
-                      ),
-                    ],
+                  ShieldMark(size: 88, color: active ? Wg.green : Wg.textFaint),
+                  const SizedBox(height: 20),
+                  Text(
+                    active ? 'Protection active' : 'Protection désactivée',
+                    style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w800,
+                      color: active ? Wg.greenDark : Wg.textDim,
+                    ),
                   ),
-                  const Spacer(),
-                  _StatusDot(active: state.protectionActive),
+                  const SizedBox(height: 6),
+                  Text(
+                    active
+                        ? 'WariGuard surveille vos appels et SMS\nen temps réel.'
+                        : 'Réactivez la protection pour être\ncouvert en temps réel.',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Wg.textDim, height: 1.5),
+                  ),
+                  const SizedBox(height: 18),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Protection',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w800, fontSize: 15)),
+                              Text(active ? 'Activée' : 'Désactivée',
+                                  style: const TextStyle(
+                                      fontSize: 12.5, color: Wg.textDim)),
+                            ],
+                          ),
+                        ),
+                        Switch(
+                          value: active,
+                          onChanged: (v) =>
+                              context.read<AppState>().setProtection(v),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 24),
+            ),
+            const SizedBox(height: 14),
 
-              // ---- Bandeau statut ----
-              WgCard(
-                borderColor:
-                    state.protectionActive ? Wg.borderHi : Wg.red.withValues(alpha: 0.4),
+            // ---- Statistiques (2 cartes comme le prototype) ----
+            Row(
+              children: [
+                Expanded(
+                  child: StatTile(
+                    value: '${state.threatsBlocked}',
+                    label: 'Menaces détectées',
+                    icon: Icons.block_rounded,
+                    accent: Wg.green,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: StatTile(
+                    value: lastLabel,
+                    label: 'Dernière analyse',
+                    icon: Icons.schedule_rounded,
+                    accent: Wg.textDim,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+
+            // ---- Simulateur (bouton pointillé du prototype) ----
+            _DashedButton(
+              onTap: () => _simulateCall(context),
+              icon: Icons.play_circle_rounded,
+              label: 'Simuler un appel suspect',
+            ),
+            const SizedBox(height: 8),
+            const Center(
+              child: Text('Mode démo — pour la présentation',
+                  style: TextStyle(fontSize: 11.5, color: Wg.textFaint)),
+            ),
+            const SizedBox(height: 22),
+
+            // ---- Chiffres réels du moteur (exigence MVP) ----
+            const SectionLabel('Moteur de détection — chiffres mesurés'),
+            if (metrics != null) _MetricsCard(metrics: metrics),
+            const SizedBox(height: 20),
+
+            // ---- Historique ----
+            const SectionLabel('Dernières analyses'),
+            if (state.history.isEmpty)
+              const WgCard(
                 child: Row(
                   children: [
-                    Icon(
-                      state.protectionActive
-                          ? Icons.verified_user_rounded
-                          : Icons.gpp_bad_rounded,
-                      color: state.protectionActive ? Wg.teal : Wg.red,
-                      size: 34,
-                    ),
-                    const SizedBox(width: 14),
+                    Icon(Icons.inbox_rounded, color: Wg.textFaint),
+                    SizedBox(width: 12),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            state.protectionActive
-                                ? 'Votre wari est sous bonne garde'
-                                : 'Boucliers éteints',
-                            style: const TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            state.protectionActive
-                                ? 'Text Shield ${state.consent.textShield ? "actif" : "inactif"} · Link Shield ${state.consent.linkShield ? "actif" : "inactif"} · analyse 100% locale'
-                                : 'Réactivez la protection depuis l\'écran Sécurité.',
-                            style: const TextStyle(fontSize: 12, color: Wg.textDim),
-                          ),
-                        ],
+                      child: Text(
+                        'Aucune analyse pour l\'instant. Simulez un appel ou testez un scénario dans Text Shield.',
+                        style: TextStyle(color: Wg.textDim, fontSize: 13),
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
+              )
+            else
+              ...state.history.take(6).map((h) => _HistoryTile(entry: h)),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-              // ---- Stats de session ----
-              const SectionLabel('Activité sur cet appareil'),
-              Row(
-                children: [
-                  Expanded(
-                      child: StatTile(
-                          value: '${state.history.length}', label: 'Analyses')),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: StatTile(
-                          value: '${state.threatsBlocked}',
-                          label: 'Menaces',
-                          accent: Wg.red)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: StatTile(
-                          value: '${state.warnings}',
-                          label: 'Suspects',
-                          accent: Wg.orange)),
-                ],
-              ),
-              const SizedBox(height: 20),
+class _DashedButton extends StatelessWidget {
+  const _DashedButton({required this.onTap, required this.icon, required this.label});
 
-              // ---- Chiffres réels du moteur ----
-              const SectionLabel('Moteur de détection — chiffres mesurés'),
-              if (metrics != null) _MetricsCard(metrics: metrics),
-              const SizedBox(height: 20),
+  final VoidCallback onTap;
+  final IconData icon;
+  final String label;
 
-              // ---- Historique ----
-              const SectionLabel('Dernières analyses'),
-              if (state.history.isEmpty)
-                const WgCard(
-                  child: Row(
-                    children: [
-                      Icon(Icons.inbox_rounded, color: Wg.textFaint),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Aucune analyse pour l\'instant. Testez un scénario dans Text Shield.',
-                          style: TextStyle(color: Wg.textDim, fontSize: 13),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                ...state.history.take(6).map((h) => _HistoryTile(entry: h)),
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: CustomPaint(
+        painter: _DashedBorderPainter(),
+        child: Container(
+          height: 56,
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20, color: Wg.text),
+              const SizedBox(width: 9),
+              Text(label,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 15, color: Wg.text)),
             ],
           ),
         ),
@@ -151,39 +226,28 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-class _StatusDot extends StatelessWidget {
-  const _StatusDot({required this.active});
-
-  final bool active;
+class _DashedBorderPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Wg.borderStrong
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6;
+    final rrect = RRect.fromRectAndRadius(
+        Offset.zero & size, const Radius.circular(18));
+    final path = Path()..addRRect(rrect);
+    const dash = 6.0, gap = 5.0;
+    for (final metric in path.computeMetrics()) {
+      var d = 0.0;
+      while (d < metric.length) {
+        canvas.drawPath(metric.extractPath(d, d + dash), paint);
+        d += dash + gap;
+      }
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final color = active ? Wg.green : Wg.red;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: color.withValues(alpha: 0.8), blurRadius: 8)],
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(active ? 'ON' : 'OFF',
-              style: TextStyle(
-                  color: color, fontSize: 11, fontWeight: FontWeight.w700)),
-        ],
-      ),
-    );
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _MetricsCard extends StatelessWidget {
@@ -201,20 +265,23 @@ class _MetricsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.psychology_rounded, color: Wg.cyan, size: 20),
+              const Icon(Icons.psychology_rounded, color: Wg.green, size: 20),
               const SizedBox(width: 8),
               const Expanded(
                 child: Text('WariGuard-Local v1.0',
-                    style: TextStyle(fontWeight: FontWeight.w700)),
+                    style: TextStyle(fontWeight: FontWeight.w800)),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Wg.cyan.withValues(alpha: 0.12),
+                  color: Wg.greenTint,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text('évalué sur ${metrics.totalExamples} exemples',
-                    style: monoStyle.copyWith(fontSize: 10, color: Wg.cyan)),
+                    style: const TextStyle(
+                        fontSize: 10,
+                        color: Wg.greenDark,
+                        fontWeight: FontWeight.w700)),
               ),
             ],
           ),
@@ -255,12 +322,12 @@ class _Metric extends StatelessWidget {
       child: Column(
         children: [
           Text(value,
-              style: monoStyle.copyWith(
-                  fontSize: 19, fontWeight: FontWeight.w600, color: Wg.teal)),
+              style: const TextStyle(
+                  fontSize: 19, fontWeight: FontWeight.w800, color: Wg.green)),
           const SizedBox(height: 2),
           Text(label,
               style: const TextStyle(
-                  fontSize: 11, fontWeight: FontWeight.w600, color: Wg.textDim)),
+                  fontSize: 11, fontWeight: FontWeight.w700, color: Wg.text)),
           Text(hint,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 8.5, color: Wg.textFaint)),
@@ -308,9 +375,9 @@ class _TypeBars extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: counts[type]! / maxCount,
                         minHeight: 7,
-                        backgroundColor: Wg.bgDeep,
+                        backgroundColor: Wg.surfaceAlt,
                         valueColor: AlwaysStoppedAnimation(
-                          type == ScamType.aucun ? Wg.green : Wg.cyan,
+                          type == ScamType.aucun ? Wg.green : Wg.orange,
                         ),
                       ),
                     ),
@@ -320,7 +387,8 @@ class _TypeBars extends StatelessWidget {
                     width: 20,
                     child: Text('${counts[type]}',
                         textAlign: TextAlign.right,
-                        style: monoStyle.copyWith(fontSize: 10.5, color: Wg.textFaint)),
+                        style:
+                            const TextStyle(fontSize: 10.5, color: Wg.textFaint)),
                   ),
                 ],
               ),
@@ -346,12 +414,20 @@ class _HistoryTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            Icon(
-              entry.channel == MessageChannel.sms
-                  ? Icons.sms_rounded
-                  : Icons.phone_rounded,
-              size: 18,
-              color: color,
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: Wg.riskTint(entry.riskLevel),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                entry.channel == MessageChannel.sms
+                    ? Icons.sms_rounded
+                    : Icons.phone_rounded,
+                size: 16,
+                color: color,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -361,7 +437,8 @@ class _HistoryTile extends StatelessWidget {
                   Text(entry.textPreview,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12.5)),
+                      style: const TextStyle(
+                          fontSize: 12.5, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 2),
                   Text(
                     '${entry.scamType == ScamType.aucun ? "Aucune menace" : entry.scamType.label} · $time',

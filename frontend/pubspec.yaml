@@ -28,6 +28,9 @@ flutter:
     - assets/data/dataset_wariguard.json
 
   fonts:
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope-Variable.ttf
     - family: Sora
       fonts:
         - asset: assets/fonts/Sora-Variable.ttf

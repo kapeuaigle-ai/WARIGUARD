@@ -71,6 +71,17 @@ class AppState extends ChangeNotifier {
       consent.mode != ConsentMode.desactive &&
       (consent.textShield || consent.linkShield);
 
+  ConsentMode _lastActiveMode = ConsentMode.aLaDemande;
+
+  /// Interrupteur « Protection » de l'écran d'accueil (design prototype).
+  Future<void> setProtection(bool on) async {
+    if (!on && consent.mode != ConsentMode.desactive) {
+      _lastActiveMode = consent.mode;
+    }
+    await updateConsent(
+        consent.copyWith(mode: on ? _lastActiveMode : ConsentMode.desactive));
+  }
+
   // ---------- Analyse ----------
 
   Future<AnalysisResult> analyzeText(String text, MessageChannel channel) async {

@@ -69,7 +69,7 @@ class _LinkShieldScreenState extends State<LinkShieldScreen> {
                     final t = _controller.text.trim();
                     if (t.isNotEmpty) _check(t);
                   },
-                  icon: const Icon(Icons.search_rounded, color: Wg.teal),
+                  icon: const Icon(Icons.search_rounded, color: Wg.green),
                 ),
               ),
               onSubmitted: (t) {
@@ -221,6 +221,7 @@ class LinkVerdictSheet {
     final result = context.read<AppState>().checkLink(url);
     return showModalBottomSheet(
       context: context,
+      constraints: const BoxConstraints(maxWidth: 406),
       backgroundColor: Wg.bg,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

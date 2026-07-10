@@ -1,4 +1,5 @@
-/// Widgets partagés : cartes, badges de risque, jauge, en-têtes de section.
+/// Widgets partagés — style du prototype : cartes blanches à bord doux,
+/// badges pill, jauge, icône bouclier vert arrondi.
 library;
 
 import 'dart:math' as math;
@@ -60,6 +61,7 @@ class SectionLabel extends StatelessWidget {
       );
 }
 
+/// Badge pill plein, comme « ! RISQUE ÉLEVÉ » du prototype.
 class RiskBadge extends StatelessWidget {
   const RiskBadge(this.level, {super.key, this.compact = false});
 
@@ -70,30 +72,30 @@ class RiskBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = Wg.riskColor(level);
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: compact ? 3 : 6),
+      padding: EdgeInsets.symmetric(
+          horizontal: compact ? 10 : 14, vertical: compact ? 4 : 7),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
+        color: color,
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: color.withValues(alpha: 0.45)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle, boxShadow: [
-              BoxShadow(color: color.withValues(alpha: 0.7), blurRadius: 6),
-            ]),
+          Icon(
+            level == RiskLevel.vert
+                ? Icons.check_rounded
+                : Icons.priority_high_rounded,
+            size: compact ? 11 : 13,
+            color: Colors.white,
           ),
-          const SizedBox(width: 7),
+          const SizedBox(width: 5),
           Text(
             Wg.riskLabel(level),
             style: TextStyle(
-              color: color,
+              color: Colors.white,
               fontSize: compact ? 10 : 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
             ),
           ),
         ],
@@ -127,9 +129,9 @@ class RiskGauge extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('${(value * 100).round()}',
-                    style: monoStyle.copyWith(
+                    style: TextStyle(
                       fontSize: size * 0.21,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w800,
                       color: Wg.riskColor(level),
                       height: 1,
                     )),
@@ -138,7 +140,7 @@ class RiskGauge extends StatelessWidget {
                         fontSize: size * 0.05,
                         letterSpacing: 1.6,
                         color: Wg.textFaint,
-                        fontWeight: FontWeight.w600)),
+                        fontWeight: FontWeight.w700)),
                 const SizedBox(height: 2),
               ],
             ),
@@ -166,7 +168,7 @@ class _GaugePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 12
       ..strokeCap = StrokeCap.round
-      ..color = Wg.bgDeep;
+      ..color = Wg.surfaceAlt;
     canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius), start, sweep, false, track);
 
@@ -174,15 +176,10 @@ class _GaugePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 12
       ..strokeCap = StrokeCap.round
-      ..shader = SweepGradient(
-        startAngle: start,
-        endAngle: start + sweep,
-        colors: [color.withValues(alpha: 0.25), color],
-      ).createShader(Rect.fromCircle(center: center, radius: radius));
+      ..color = color;
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), start,
         sweep * value.clamp(0.001, 1.0), false, arc);
 
-    // Graduations seuils orange / rouge
     for (final t in [0.35, 0.65]) {
       final angle = start + sweep * t;
       final p1 = center + Offset(math.cos(angle), math.sin(angle)) * (radius - 12);
@@ -191,7 +188,7 @@ class _GaugePainter extends CustomPainter {
           p1,
           p2,
           Paint()
-            ..color = Wg.textFaint.withValues(alpha: 0.5)
+            ..color = Wg.borderStrong
             ..strokeWidth = 1.5);
     }
   }
@@ -200,34 +197,46 @@ class _GaugePainter extends CustomPainter {
   bool shouldRepaint(_GaugePainter old) => old.value != value || old.color != color;
 }
 
+/// Carte statistique du prototype : pastille d'icône, grand chiffre, libellé.
 class StatTile extends StatelessWidget {
   const StatTile({
     super.key,
     required this.value,
     required this.label,
-    this.accent = Wg.teal,
+    this.icon = Icons.shield_rounded,
+    this.accent = Wg.green,
   });
 
   final String value;
   final String label;
+  final IconData icon;
   final Color accent;
 
   @override
   Widget build(BuildContext context) {
     return WgCard(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 16, color: accent),
+          ),
+          const SizedBox(height: 10),
           Text(value,
-              style: monoStyle.copyWith(
-                  fontSize: 22, fontWeight: FontWeight.w600, color: accent)),
-          const SizedBox(height: 4),
-          Text(label.toUpperCase(),
               style: const TextStyle(
-                  fontSize: 9.5,
-                  letterSpacing: 1.1,
-                  color: Wg.textFaint,
+                  fontSize: 22, fontWeight: FontWeight.w800, color: Wg.text)),
+          const SizedBox(height: 2),
+          Text(label,
+              style: const TextStyle(
+                  fontSize: 11.5,
+                  color: Wg.textDim,
                   fontWeight: FontWeight.w600)),
         ],
       ),
@@ -235,9 +244,9 @@ class StatTile extends StatelessWidget {
   }
 }
 
-/// Logo bouclier minimal.
+/// Icône bouclier : carré arrondi vert, bouclier blanc (logo du prototype).
 class ShieldMark extends StatelessWidget {
-  const ShieldMark({super.key, this.size = 34, this.color = Wg.teal});
+  const ShieldMark({super.key, this.size = 34, this.color = Wg.green});
 
   final double size;
   final Color color;
@@ -248,17 +257,38 @@ class ShieldMark extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [color, Wg.cyan],
-        ),
-        borderRadius: BorderRadius.circular(size * 0.32),
-        boxShadow: [
-          BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 18, spreadRadius: -4),
-        ],
+        color: color,
+        borderRadius: BorderRadius.circular(size * 0.3),
       ),
-      child: Icon(Icons.shield_rounded, size: size * 0.55, color: const Color(0xFF04241E)),
+      child: Icon(Icons.verified_user_rounded,
+          size: size * 0.55, color: Colors.white),
+    );
+  }
+}
+
+/// Pastille circulaire teintée avec icône (permissions, alertes du prototype).
+class IconBubble extends StatelessWidget {
+  const IconBubble({
+    super.key,
+    required this.icon,
+    this.color = Wg.green,
+    this.size = 56,
+  });
+
+  final IconData icon;
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(size * 0.3),
+      ),
+      child: Icon(icon, size: size * 0.45, color: color),
     );
   }
 }

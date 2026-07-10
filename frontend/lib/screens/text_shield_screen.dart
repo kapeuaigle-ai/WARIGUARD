@@ -1,5 +1,6 @@
-/// Text Shield — simulateur SMS / appel entrant + analyse + alerte visuelle
-/// rouge / orange / vert. Cœur de la démo live du pitch.
+/// Text Shield — simulateur SMS / appel entrant. L'alerte s'affiche dans la
+/// feuille du prototype (AlertSheet), le détail complet (jauge, signaux,
+/// recommandation) reste disponible sous le message.
 library;
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../models.dart';
 import '../services/app_state.dart';
 import '../services/link_shield.dart';
 import '../theme.dart';
+import '../widgets/alert_sheet.dart';
 import '../widgets/common.dart';
 import 'link_shield_screen.dart' show LinkVerdictSheet;
 
@@ -54,6 +56,7 @@ class _TextShieldScreenState extends State<TextShieldScreen> {
       _analyzing = false;
       _result = result;
     });
+    await AlertSheet.show(context, result: result, channel: _channel);
   }
 
   void _reset() => setState(() {
@@ -69,9 +72,10 @@ class _TextShieldScreenState extends State<TextShieldScreen> {
     final scenarios = state.ready ? state.dataset.demoScenarios() : <DatasetExample>[];
 
     return Scaffold(
+      backgroundColor: Wg.bg,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
           children: [
             Row(
               children: [
@@ -80,7 +84,8 @@ class _TextShieldScreenState extends State<TextShieldScreen> {
                 if (_incomingText != null)
                   TextButton.icon(
                     onPressed: _reset,
-                    icon: const Icon(Icons.refresh_rounded, size: 16, color: Wg.textDim),
+                    icon: const Icon(Icons.refresh_rounded,
+                        size: 16, color: Wg.textDim),
                     label: const Text('Réinitialiser',
                         style: TextStyle(color: Wg.textDim, fontSize: 12)),
                   ),
@@ -124,20 +129,23 @@ class _TextShieldScreenState extends State<TextShieldScreen> {
                       setState(() => _channel = s.channel);
                       _run(s.text);
                     },
-                    backgroundColor: Wg.surface,
+                    backgroundColor: Wg.bgPage,
                     side: const BorderSide(color: Wg.border),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100)),
                     avatar: Icon(
                       s.label == ScamType.aucun
-                          ? Icons.check_circle_outline
-                          : Icons.warning_amber_rounded,
+                          ? Icons.check_circle_rounded
+                          : Icons.warning_rounded,
                       size: 15,
                       color: s.label == ScamType.aucun ? Wg.green : Wg.orange,
                     ),
                     label: Text(
                       s.label == ScamType.aucun ? 'Message légitime' : s.label.label,
-                      style: const TextStyle(fontSize: 12, color: Wg.text),
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Wg.text,
+                          fontWeight: FontWeight.w700),
                     ),
                   ),
               ],
@@ -159,7 +167,7 @@ class _TextShieldScreenState extends State<TextShieldScreen> {
                     final t = _controller.text.trim();
                     if (t.isNotEmpty) _run(t);
                   },
-                  icon: const Icon(Icons.shield_rounded, color: Wg.teal),
+                  icon: const Icon(Icons.shield_rounded, color: Wg.green),
                   tooltip: 'Analyser',
                 ),
               ),
@@ -185,8 +193,9 @@ class _TextShieldScreenState extends State<TextShieldScreen> {
             // ---- Analyse en cours ----
             if (_analyzing) const _AnalyzingCard(),
 
-            // ---- Verdict ----
-            if (_result != null) _VerdictCard(result: _result!, sourceText: _incomingText!),
+            // ---- Détail du verdict ----
+            if (_result != null)
+              _VerdictCard(result: _result!, sourceText: _incomingText!),
           ],
         ),
       ),
@@ -216,22 +225,22 @@ class _ChannelChip extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 11),
           decoration: BoxDecoration(
-            color: selected ? Wg.teal.withValues(alpha: 0.12) : Wg.surface,
+            color: selected ? Wg.greenTint : Wg.bgPage,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: selected ? Wg.teal : Wg.border),
+            border: Border.all(color: selected ? Wg.green : Wg.border),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 15, color: selected ? Wg.teal : Wg.textDim),
+              Icon(icon, size: 15, color: selected ? Wg.greenDark : Wg.textDim),
               const SizedBox(width: 7),
               Flexible(
                 child: Text(label,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        color: selected ? Wg.teal : Wg.textDim)),
+                        fontWeight: FontWeight.w700,
+                        color: selected ? Wg.greenDark : Wg.textDim)),
               ),
             ],
           ),
@@ -251,7 +260,7 @@ class _IncomingBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor =
-        result == null ? Wg.border : Wg.riskColor(result!.riskLevel).withValues(alpha: 0.55);
+        result == null ? Wg.border : Wg.riskColor(result!.riskLevel);
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
       duration: const Duration(milliseconds: 350),
@@ -263,7 +272,7 @@ class _IncomingBubble extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Wg.surfaceHi,
+          color: Wg.bgPage,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(4),
             topRight: Radius.circular(16),
@@ -279,7 +288,7 @@ class _IncomingBubble extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 11,
-                  backgroundColor: Wg.bgDeep,
+                  backgroundColor: Wg.surfaceAlt,
                   child: Icon(
                     channel == MessageChannel.sms
                         ? Icons.person_rounded
@@ -289,12 +298,14 @@ class _IncomingBubble extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text('Numéro inconnu · +225 XX XX XX XX',
-                    style: monoStyle.copyWith(fontSize: 10.5, color: Wg.textFaint)),
+                const Text('Numéro inconnu · +225 XX XX XX XX',
+                    style: TextStyle(fontSize: 10.5, color: Wg.textFaint)),
               ],
             ),
             const SizedBox(height: 10),
-            Text(text, style: const TextStyle(fontSize: 13.5, height: 1.5)),
+            Text(text,
+                style: const TextStyle(
+                    fontSize: 13.5, height: 1.5, color: Wg.text)),
           ],
         ),
       ),
@@ -307,24 +318,25 @@ class _AnalyzingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WgCard(
+    return const WgCard(
       child: Row(
         children: [
-          const SizedBox(
+          SizedBox(
             width: 18,
             height: 18,
-            child: CircularProgressIndicator(strokeWidth: 2.2, color: Wg.teal),
+            child: CircularProgressIndicator(strokeWidth: 2.2, color: Wg.green),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Analyse WariGuard en cours…',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5)),
-                const SizedBox(height: 2),
+                Text('Analyse WariGuard en cours…',
+                    style:
+                        TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                SizedBox(height: 2),
                 Text('Moteur local · aucune donnée ne quitte l\'appareil',
-                    style: monoStyle.copyWith(fontSize: 10.5, color: Wg.textFaint)),
+                    style: TextStyle(fontSize: 10.5, color: Wg.textFaint)),
               ],
             ),
           ),
@@ -354,8 +366,7 @@ class _VerdictCard extends StatelessWidget {
         child: Transform.translate(offset: Offset(0, 16 * (1 - v)), child: child),
       ),
       child: WgCard(
-        borderColor: color.withValues(alpha: 0.5),
-        color: Color.alphaBlend(color.withValues(alpha: 0.05), Wg.surface),
+        borderColor: color.withValues(alpha: 0.4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -365,17 +376,19 @@ class _VerdictCard extends StatelessWidget {
                 const Spacer(),
                 if (result.scamType != ScamType.aucun)
                   Text(result.scamType.label.toUpperCase(),
-                      style: monoStyle.copyWith(
+                      style: TextStyle(
                           fontSize: 11,
                           color: color,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w800,
                           letterSpacing: 1)),
               ],
             ),
             const SizedBox(height: 6),
             Center(child: RiskGauge(score: result.riskScore, level: result.riskLevel)),
             const SizedBox(height: 12),
-            Text(result.explanation, style: const TextStyle(fontSize: 13.5, height: 1.5)),
+            Text(result.explanation,
+                style: const TextStyle(
+                    fontSize: 13.5, height: 1.5, color: Wg.text)),
             if (result.triggers.isNotEmpty) ...[
               const SizedBox(height: 14),
               const SectionLabel('Signaux déclencheurs'),
@@ -387,15 +400,15 @@ class _VerdictCard extends StatelessWidget {
                     Tooltip(
                       message: t.category,
                       child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 9, vertical: 5),
                         decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.1),
+                          color: Wg.riskTint(result.riskLevel),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: color.withValues(alpha: 0.3)),
                         ),
                         child: Text('« ${t.text} »',
-                            style: monoStyle.copyWith(fontSize: 10.5, color: Wg.text)),
+                            style: monoStyle.copyWith(
+                                fontSize: 10.5, color: Wg.text)),
                       ),
                     ),
                 ],
@@ -405,7 +418,7 @@ class _VerdictCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Wg.bgDeep,
+                color: Wg.bgPage,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -421,7 +434,8 @@ class _VerdictCard extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(result.recommendation,
-                        style: const TextStyle(fontSize: 12.5, height: 1.45)),
+                        style: const TextStyle(
+                            fontSize: 12.5, height: 1.45, color: Wg.text)),
                   ),
                 ],
               ),
