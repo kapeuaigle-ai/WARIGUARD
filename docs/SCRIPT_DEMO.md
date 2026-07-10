@@ -1,43 +1,45 @@
 # Script de démo WariGuard — 2 min 30
 
-> Préparation : `flutter run -d chrome` lancé AVANT le passage, app sur l'onboarding
-> (effacer le stockage du site pour repartir de zéro). Zoom navigateur 110%.
+> Préparation : `flutter run -d chrome` (ou l'APK sur téléphone) lancé AVANT le
+> passage, stockage du site vidé pour repartir de l'onboarding.
 
-## 0:00 — Consentement (15 s)
-- « Avant toute analyse, l'utilisateur choisit. Deux modes : protection permanente,
-  ou à la demande. Rien ne tourne sans accord. »
-- Sélectionner **À la demande** → **Activer WariGuard**.
+## 0:00 — Onboarding (20 s)
+- Écran **Bienvenue** : « Le bouclier intelligent contre le phishing vocal ». → *Continuer*.
+- Écran **Permissions** : micro + superposition d'écran, chacune justifiée.
+  « WariGuard n'accède à ces fonctions que pendant un appel suspect. Rien n'est
+  enregistré. » → *Autoriser et continuer*.
 
-## 0:15 — Accueil : des chiffres, pas des promesses (25 s)
-- Montrer le bloc **Moteur de détection — chiffres mesurés** : rappel, précision, F1
-  calculés en direct sur 67 exemples annotés (FR + Nouchi).
-- « Ces chiffres sont recalculés à chaque lancement, sur l'appareil. »
+## 0:20 — Accueil (20 s)
+- Bouclier vert **Protection active**, toggle, compteur de menaces, dernière analyse.
+- « La sécurité doit être invisible jusqu'à ce qu'elle soit nécessaire. »
 
-## 0:40 — Text Shield : l'arnaque au faux agent (40 s)
-- Onglet **Text Shield** → chip **Faux agent** (transcription d'appel).
-- Le message arrive, l'analyse tourne, verdict **ROUGE / DANGER** :
-  jauge, type d'arnaque, mots déclencheurs (« code secret », « compte bloqué »),
-  recommandation (« un opérateur ne demande JAMAIS votre code »).
-- Enchaîner chip **Message légitime** → **VERT**. « Pas de sur-blocage : un vrai
-  reçu Orange Money passe. »
+## 0:40 — L'écran roi : le pop-up d'alerte (50 s)
+- Appuyer sur **Simuler un appel suspect**. Le pipeline réel tourne : le moteur
+  analyse la transcription et produit l'alerte (rien n'est scripté).
+- Le pop-up se superpose à l'app : **RISQUE ÉLEVÉ**, « Arnaque probable détectée »,
+  3 déclencheurs (demande de code secret, usurpation d'identité d'agent, menace
+  de blocage), et le chip **Bouclier Texte** qui a détecté la menace.
+- Trois actions : **Raccrocher** (rouge, dominante), **Signaler** (orange),
+  **Continuer l'appel** (discret). → *Raccrocher*.
+- L'app bascule sur Alertes : l'entrée est loguée avec le statut « Bloqué ».
 
-## 1:20 — Link Shield : le lien piégé (30 s)
-- Onglet **Link Shield** → lien `orange-money-verification.xyz`.
-- Verdict **LIEN BLOQUÉ** avant ouverture : usurpation de marque, TLD à risque,
-  pas de HTTPS.
-- Contraste : `wave.com` → **SÛR**.
+## 1:30 — Alertes & détail (35 s)
+- Ouvrir **SMS « Vous avez gagné 500 000 FCFA »**.
+- Les deux boucliers apparaissent : **Bouclier Texte** + **Bouclier Lien**, avec
+  « Lien bloqué avant ouverture — raccourcisseur d'url (bit.ly) ».
+- **Pourquoi cette détection** : réclamation de lot, loterie fictive, annonce de gain.
+- **Conseil** : « Aucun gain légitime n'exige de frais ou de code. »
 
-## 1:50 — Sécurité : la preuve (30 s)
-- Onglet **Sécurité** : montrer le blob **AES-256** (illisible), cliquer
-  **Déchiffrer avec la clé locale** → données lisibles. « Tout reste sur le
-  téléphone, chiffré. »
-- Montrer **Moteur d'analyse** : « Le classifieur CamemBERT arrive — le contrat
-  JSON est figé, on bascule ici sans changer une ligne d'interface. »
+## 2:05 — Preuves (20 s)
+- **Paramètres** : modes de protection (automatique / à la demande), autorisations.
+  Couper le micro → bandeau orange « Action requise » sur l'Accueil : aucun crash,
+  mode dégradé (critère d'acceptation du cahier des charges). Réactiver.
+- **Données locales & chiffrement** : le blob **AES-256** illisible, puis
+  *Déchiffrer avec la clé locale*. Chiffres réels du moteur : rappel 98 %,
+  précision 98 %, F1 98 %, sur 67 exemples annotés.
 
-## 2:20 — Clôture (10 s)
-- Retour **Accueil** : compteurs d'activité mis à jour (analyses, menaces).
-- « WariGuard : détection locale, consentement d'abord, preuves à l'appui. »
+## 2:25 — Clôture (5 s)
+- « Détection locale, consentement d'abord, preuves à l'appui. »
 
 ## Plan B (si souci machine)
 - Les tests tournent hors UI : `flutter test` (11 verts).
-- Captures d'écran de secours dans le dossier de pitch (à générer vendredi).

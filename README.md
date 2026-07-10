@@ -11,11 +11,21 @@ Un serveur FastAPI optionnel est prêt pour accueillir le modèle ML en cours de
 
 | Exigence | Où dans l'app |
 |---|---|
-| Scénario texte/vocal → alerte rouge/orange/vert | Onglet **Text Shield** (simulateur SMS + transcription d'appel, jauge + signaux déclencheurs) |
-| Lien malveillant détecté et bloqué avant ouverture | Onglet **Link Shield** + blocage inline depuis Text Shield |
-| Écran de consentement ≥ 2 modes d'activation | **Onboarding** au premier lancement (permanent / à la demande / désactivé), modifiable dans **Sécurité** |
-| Preuve données locales/chiffrées (AES-256) | Onglet **Sécurité** : blob chiffré affiché + déchiffrement à la demande, empreinte de clé |
-| Chiffres réels dataset + performance | **Accueil** : précision, rappel, F1, exactitude de type mesurés en direct sur les 67 exemples annotés |
+| Scénario texte/vocal → alerte rouge/orange/vert | **Simuler un appel suspect** (Accueil) → pop-up d'alerte produit par le vrai moteur ; niveaux de risque en couleur |
+| Lien malveillant détecté et bloqué avant ouverture | **Bouclier Lien** : chip dans la page d'alerte + « Lien bloqué avant ouverture » avec la raison |
+| Écran de consentement ≥ 2 modes d'activation | **Permissions** à l'onboarding + **Paramètres** : mode automatique / à la demande, autoriser l'analyse |
+| Preuve données locales/chiffrées (AES-256) | **Paramètres → Données locales & chiffrement** : blob chiffré affiché + déchiffrement, empreinte de clé |
+| Chiffres réels dataset + performance | Même écran : précision, rappel, F1, exactitude de type mesurés en direct sur les 67 exemples annotés |
+
+Les deux boucliers du dossier technique apparaissent en français dans la page
+d'alerte : **Bouclier Texte** (SMS et transcriptions d'appel) et **Bouclier
+Lien** (URL vérifiées avant ouverture).
+
+## Écrans
+
+Onboarding (Bienvenue, Permissions) · Accueil · Pop-up d'alerte (« écran roi »)
+· Alertes + détail · Paramètres · À propos. Navigation basse à 4 entrées,
+conforme au cahier des charges UX.
 
 ## Lancer l'app (démo)
 
@@ -36,7 +46,7 @@ flutter build apk --release    # APK Android pour démo sur téléphone
 
 ```bash
 cd frontend
-flutter test        # 11 tests : moteur de détection + Link Shield + contrat JSON
+flutter test        # 11 tests : moteur de détection + Bouclier Lien + contrat JSON
 ```
 
 ## Serveur modèle (optionnel — pour le futur classifieur)

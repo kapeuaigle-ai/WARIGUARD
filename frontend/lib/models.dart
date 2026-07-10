@@ -2,6 +2,8 @@
 /// modèle ML (voir docs/CONTRAT_MODELE.md et backend/app/schemas.py).
 library;
 
+import 'package:flutter/material.dart';
+
 enum RiskLevel {
   rouge,
   orange,
@@ -25,7 +27,25 @@ enum ScamType {
       ScamType.values.firstWhere((e) => e.json == v, orElse: () => ScamType.aucun);
 }
 
-enum MessageChannel { sms, appel }
+enum MessageChannel {
+  sms('sms', 'Arnaque par SMS', Icons.sms_rounded),
+  appel('appel', 'Phishing vocal', Icons.call_rounded);
+
+  const MessageChannel(this.json, this.typeLabel, this.icon);
+  final String json;
+  final String typeLabel;
+  final IconData icon;
+}
+
+/// Les deux boucliers de détection du MVP, en français pour la page d'alerte.
+enum Shield {
+  texte('Bouclier Texte', Icons.textsms_rounded),
+  lien('Bouclier Lien', Icons.link_rounded);
+
+  const Shield(this.label, this.icon);
+  final String label;
+  final IconData icon;
+}
 
 class Trigger {
   const Trigger({required this.text, required this.category, required this.weight});
@@ -118,102 +138,169 @@ class LinkCheckResult {
   final List<String> reasons;
 }
 
-enum ConsentMode {
-  permanent('Protection permanente',
-      'WariGuard analyse automatiquement chaque SMS et appel entrant, en arrière-plan.'),
-  aLaDemande('À la demande',
-      'Rien n\'est analysé sans votre geste : vous soumettez un message quand vous avez un doute.'),
-  desactive('Désactivé', 'Aucune analyse. Les boucliers sont éteints.');
+enum AlertStatus {
+  blocked('Bloqué', Icons.block_rounded),
+  reported('Signalé', Icons.flag_rounded),
+  ignored('Ignoré', Icons.remove_circle_outline_rounded);
 
-  const ConsentMode(this.label, this.description);
+  const AlertStatus(this.label, this.icon);
   final String label;
-  final String description;
+  final IconData icon;
+
+  static AlertStatus fromJson(String v) => AlertStatus.values.byName(v);
 }
 
-class ConsentSettings {
-  const ConsentSettings({
-    this.mode = ConsentMode.aLaDemande,
-    this.textShield = true,
-    this.linkShield = true,
-    this.behaviorShield = false,
-    this.onboarded = false,
-  });
-
-  final ConsentMode mode;
-  final bool textShield;
-  final bool linkShield;
-  final bool behaviorShield;
-  final bool onboarded;
-
-  ConsentSettings copyWith({
-    ConsentMode? mode,
-    bool? textShield,
-    bool? linkShield,
-    bool? behaviorShield,
-    bool? onboarded,
-  }) =>
-      ConsentSettings(
-        mode: mode ?? this.mode,
-        textShield: textShield ?? this.textShield,
-        linkShield: linkShield ?? this.linkShield,
-        behaviorShield: behaviorShield ?? this.behaviorShield,
-        onboarded: onboarded ?? this.onboarded,
-      );
-
-  Map<String, dynamic> toJson() => {
-        'mode': mode.name,
-        'text_shield': textShield,
-        'link_shield': linkShield,
-        'behavior_shield': behaviorShield,
-        'onboarded': onboarded,
-      };
-
-  factory ConsentSettings.fromJson(Map<String, dynamic> j) => ConsentSettings(
-        mode: ConsentMode.values.byName(j['mode'] as String? ?? 'aLaDemande'),
-        textShield: j['text_shield'] as bool? ?? true,
-        linkShield: j['link_shield'] as bool? ?? true,
-        behaviorShield: j['behavior_shield'] as bool? ?? false,
-        onboarded: j['onboarded'] as bool? ?? false,
-      );
-}
-
-class HistoryEntry {
-  const HistoryEntry({
+/// Une alerte de l'historique — produite par le vrai moteur puis chiffrée
+/// localement (AES-256). Alimente la liste Alertes et l'écran de détail.
+class AlertRecord {
+  const AlertRecord({
     required this.id,
     required this.timestamp,
     required this.channel,
-    required this.textPreview,
+    required this.title,
     required this.riskLevel,
     required this.scamType,
     required this.riskScore,
+    required this.triggers,
+    required this.advice,
+    required this.status,
+    required this.shields,
+    this.linkVerdict,
+    this.linkReason,
+    this.dateLabel,
   });
 
   final String id;
   final DateTime timestamp;
   final MessageChannel channel;
-  final String textPreview;
+  final String title;
   final RiskLevel riskLevel;
   final ScamType scamType;
   final double riskScore;
 
+  /// Déclencheurs lisibles (catégories renvoyées par le moteur).
+  final List<String> triggers;
+  final String advice;
+  final AlertStatus status;
+
+  /// Boucliers ayant détecté la menace (Texte, Lien).
+  final List<Shield> shields;
+  final LinkVerdict? linkVerdict;
+  final String? linkReason;
+
+  /// Libellé de date figé (pour l'historique de démonstration).
+  final String? dateLabel;
+
+  String get typeLabel => channel.typeLabel;
+
+  String get relativeDate {
+    if (dateLabel != null) return dateLabel!;
+    final now = DateTime.now();
+    final diff = now.difference(timestamp);
+    final hh = timestamp.hour.toString().padLeft(2, '0');
+    final mm = timestamp.minute.toString().padLeft(2, '0');
+    if (diff.inMinutes < 1) return "À l'instant";
+    if (diff.inMinutes < 60) return 'Il y a ${diff.inMinutes} min';
+    if (now.day == timestamp.day) return "Aujourd'hui, $hh:$mm";
+    if (diff.inDays == 1) return 'Hier, $hh:$mm';
+    return '${timestamp.day}/${timestamp.month}, $hh:$mm';
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'timestamp': timestamp.toIso8601String(),
-        'channel': channel.name,
-        'text_preview': textPreview,
+        'channel': channel.json,
+        'title': title,
         'risk_level': riskLevel.name,
         'scam_type': scamType.json,
         'risk_score': riskScore,
+        'triggers': triggers,
+        'advice': advice,
+        'status': status.name,
+        'shields': shields.map((s) => s.name).toList(),
+        'link_verdict': linkVerdict?.name,
+        'link_reason': linkReason,
+        'date_label': dateLabel,
       };
 
-  factory HistoryEntry.fromJson(Map<String, dynamic> j) => HistoryEntry(
+  factory AlertRecord.fromJson(Map<String, dynamic> j) => AlertRecord(
         id: j['id'] as String,
         timestamp: DateTime.parse(j['timestamp'] as String),
         channel: MessageChannel.values.byName(j['channel'] as String),
-        textPreview: j['text_preview'] as String,
+        title: j['title'] as String,
         riskLevel: RiskLevel.fromJson(j['risk_level'] as String),
         scamType: ScamType.fromJson(j['scam_type'] as String),
         riskScore: (j['risk_score'] as num).toDouble(),
+        triggers: (j['triggers'] as List).cast<String>(),
+        advice: j['advice'] as String,
+        status: AlertStatus.fromJson(j['status'] as String),
+        shields: (j['shields'] as List)
+            .map((s) => Shield.values.byName(s as String))
+            .toList(),
+        linkVerdict: j['link_verdict'] == null
+            ? null
+            : LinkVerdict.values.byName(j['link_verdict'] as String),
+        linkReason: j['link_reason'] as String?,
+        dateLabel: j['date_label'] as String?,
+      );
+}
+
+enum ProtectionMode { automatique, aLaDemande }
+
+/// Réglages utilisateur : permissions et modes (consentement du MVP).
+class AppSettings {
+  const AppSettings({
+    this.onboarded = false,
+    this.protection = true,
+    this.micGranted = true,
+    this.overlayGranted = true,
+    this.mode = ProtectionMode.automatique,
+    this.allowAnalysis = true,
+  });
+
+  final bool onboarded;
+  final bool protection;
+  final bool micGranted;
+  final bool overlayGranted;
+  final ProtectionMode mode;
+  final bool allowAnalysis;
+
+  bool get permMissing => !micGranted || !overlayGranted;
+  bool get protectionOn => protection && !permMissing;
+
+  AppSettings copyWith({
+    bool? onboarded,
+    bool? protection,
+    bool? micGranted,
+    bool? overlayGranted,
+    ProtectionMode? mode,
+    bool? allowAnalysis,
+  }) =>
+      AppSettings(
+        onboarded: onboarded ?? this.onboarded,
+        protection: protection ?? this.protection,
+        micGranted: micGranted ?? this.micGranted,
+        overlayGranted: overlayGranted ?? this.overlayGranted,
+        mode: mode ?? this.mode,
+        allowAnalysis: allowAnalysis ?? this.allowAnalysis,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'onboarded': onboarded,
+        'protection': protection,
+        'mic': micGranted,
+        'overlay': overlayGranted,
+        'mode': mode.name,
+        'allow_analysis': allowAnalysis,
+      };
+
+  factory AppSettings.fromJson(Map<String, dynamic> j) => AppSettings(
+        onboarded: j['onboarded'] as bool? ?? false,
+        protection: j['protection'] as bool? ?? true,
+        micGranted: j['mic'] as bool? ?? true,
+        overlayGranted: j['overlay'] as bool? ?? true,
+        mode: ProtectionMode.values.byName(j['mode'] as String? ?? 'automatique'),
+        allowAnalysis: j['allow_analysis'] as bool? ?? true,
       );
 }
 

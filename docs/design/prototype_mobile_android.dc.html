@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#0E7A55">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0E7A55"/>
+    <rect x="480" y="280" width="240" height="240" rx="72" fill="#ffffff"/>
+    <path d="M600 340l70 26v58c0 45-30 78-70 96-40-18-70-51-70-96v-58z" fill="#0E7A55"/>
+    <path d="M572 452l22 22 40-48" fill="none" stroke="#ffffff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0&display=block">
+<style>
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{margin:0;background:#eceeef;font-family:'Manrope',system-ui,sans-serif;color:#12181C}
+  .wg-scroll::-webkit-scrollbar{width:0;height:0}
+  .wg-scroll{scrollbar-width:none}
+  .msr{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;font-feature-settings:'liga';-webkit-font-feature-settings:'liga';font-variation-settings:'FILL' 1}
+  .msr.thin{font-variation-settings:'FILL' 0}
+  a{color:#0E7A55;text-decoration:none}
+  a:hover{color:#0B5E43}
+  @keyframes wgPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.12);opacity:0}}
+  @keyframes wgOverlayIn{from{opacity:0}to{opacity:1}}
+  @keyframes wgSheetIn{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes wgScreenIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @media (max-width:560px){
+    #wg-stage{padding:0 !important;min-height:100dvh !important;background:#fff !important;align-items:stretch !important}
+    #wg-device{width:100vw !important;height:100dvh !important;border-radius:0 !important;padding:0 !important;box-shadow:none !important}
+    #wg-screen{border-radius:0 !important}
+  }
+</style>
+</helmet>
+<div id="wg-stage" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(circle at 50% 0%,#f4f5f6,#e6e8ea)">
+  <div id="wg-device" style="position:relative;width:384px;height:832px;background:#0d0f10;border-radius:46px;padding:11px;box-shadow:0 40px 80px -24px rgba(16,24,20,.34),0 0 0 1px rgba(0,0,0,.04)">
+    <div id="wg-screen" style="position:relative;width:100%;height:100%;background:#FFFFFF;border-radius:36px;overflow:hidden;display:flex;flex-direction:column">
+
+      <!-- STATUS BAR -->
+      <div style="flex:none;height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 26px;font-size:13px;font-weight:700;color:#12181C;z-index:5">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="msr" style="font-size:16px">signal_cellular_alt</span>
+          <span class="msr" style="font-size:16px">wifi</span>
+          <span class="msr" style="font-size:18px">battery_full</span>
+        </div>
+      </div>
+
+      <!-- SCREEN AREA -->
+      <div class="wg-scroll" style="position:relative;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden">
+
+        <!-- ===== WELCOME ===== -->
+        <sc-if value="{{ showWelcome }}" hint-placeholder-val="{{ true }}">
+          <div style="min-height:100%;display:flex;flex-direction:column;padding:0 28px 34px;animation:wgScreenIn .35s ease">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:20px">
+              <div style="position:relative;width:132px;height:132px;display:flex;align-items:center;justify-content:center;margin-bottom:40px">
+                <div style="position:absolute;inset:0;border-radius:50%;background:#E7F2EC;animation:wgPulse 2.8s ease-in-out infinite"></div>
+                <div style="position:relative;width:104px;height:104px;border-radius:32px;background:#0E7A55;display:flex;align-items:center;justify-content:center">
+                  <span class="msr" style="font-size:56px;color:#fff">verified_user</span>
+                </div>
+              </div>
+              <div style="font-size:12px;font-weight:700;letter-spacing:.14em;color:#0E7A55;margin-bottom:16px">WARIGUARD</div>
+              <h1 style="margin:0 0 16px;font-size:27px;font-weight:800;line-height:1.2;letter-spacing:-.02em;color:#12181C;text-wrap:balance">Le bouclier intelligent contre le phishing vocal</h1>
+              <p style="margin:0;font-size:15px;line-height:1.55;color:#5C666D;max-width:280px">WariGuard détecte les arnaques Mobile Money en temps réel et vous protège avant qu'il ne soit trop tard.</p>
+            </div>
+            <button onClick="{{ goPermissions }}" style="width:100%;height:56px;border:none;border-radius:16px;background:#0E7A55;color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">Continuer<span class="msr" style="font-size:20px">arrow_forward</span></button>
+          </div>
+        </sc-if>
+
+        <!-- ===== PERMISSIONS ===== -->
+        <sc-if value="{{ showPermissions }}" hint-placeholder-val="{{ true }}">
+          <div style="min-height:100%;display:flex;flex-direction:column;padding:28px 28px 34px;animation:wgScreenIn .35s ease">
+            <div style="width:52px;height:52px;border-radius:15px;background:#E7F2EC;display:flex;align-items:center;justify-content:center;margin-bottom:22px">
+              <span class="msr" style="font-size:28px;color:#0E7A55">lock</span>
+            </div>
+            <h1 style="margin:0 0 10px;font-size:24px;font-weight:800;line-height:1.22;letter-spacing:-.02em">Deux autorisations pour vous protéger</h1>
+            <p style="margin:0 0 26px;font-size:14.5px;line-height:1.5;color:#5C666D">WariGuard n'accède à ces fonctions que pendant un appel suspect. Rien n'est enregistré.</p>
+
+            <div style="display:flex;flex-direction:column;gap:14px;flex:1">
+              <div style="border:1px solid #E7EAEC;border-radius:18px;padding:18px">
+                <div style="display:flex;align-items:center;gap:14px">
+                  <div style="flex:none;width:44px;height:44px;border-radius:13px;background:#F6F7F8;display:flex;align-items:center;justify-content:center"><span class="msr thin" style="font-size:24px;color:#12181C">mic</span></div>
+                  <div style="flex:1"><div style="font-size:15.5px;font-weight:700">Microphone</div><div style="font-size:13px;color:#5C666D;line-height:1.45;margin-top:2px">Pour analyser la voix de l'appelant et détecter les tentatives d'arnaque.</div></div>
+                </div>
+              </div>
+              <div style="border:1px solid #E7EAEC;border-radius:18px;padding:18px">
+                <div style="display:flex;align-items:center;gap:14px">
+                  <div style="flex:none;width:44px;height:44px;border-radius:13px;background:#F6F7F8;display:flex;align-items:center;justify-content:center"><span class="msr thin" style="font-size:24px;color:#12181C">layers</span></div>
+                  <div style="flex:1"><div style="font-size:15.5px;font-weight:700">Superposition d'écran</div><div style="font-size:13px;color:#5C666D;line-height:1.45;margin-top:2px">Pour afficher l'alerte par-dessus l'appel, même hors de l'application.</div></div>
+                </div>
+              </div>
+            </div>
+
+            <button onClick="{{ grantPerms }}" style="width:100%;height:56px;border:none;border-radius:16px;background:#0E7A55;color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;margin-top:22px">Autoriser et continuer</button>
+            <button onClick="{{ skipPerms }}" style="width:100%;height:44px;border:none;background:transparent;color:#5C666D;font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;margin-top:6px">Plus tard</button>
+          </div>
+        </sc-if>
+
+        <!-- ===== HOME ===== -->
+        <sc-if value="{{ isHomeScreen }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;padding:8px 20px 24px;animation:wgScreenIn .35s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px 18px">
+              <div style="display:flex;align-items:center;gap:9px">
+                <div style="width:28px;height:28px;border-radius:9px;background:#0E7A55;display:flex;align-items:center;justify-content:center"><span class="msr" style="font-size:17px;color:#fff">verified_user</span></div>
+                <span style="font-size:17px;font-weight:800;letter-spacing:-.01em">WariGuard</span>
+              </div>
+            </div>
+
+            <!-- Permission warning banner -->
+            <sc-if value="{{ permMissing }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ fixPermission }}" style="display:flex;align-items:center;gap:12px;background:#FCEFE1;border:1px solid #F5D9BC;border-radius:14px;padding:13px 15px;margin-bottom:16px;cursor:pointer">
+                <span class="msr" style="font-size:22px;color:#E8760C">warning</span>
+                <div style="flex:1;font-size:13px;line-height:1.4;color:#8A4B04;font-weight:600">Une autorisation manque — vous n'êtes pas entièrement protégé.</div>
+                <span class="msr" style="font-size:20px;color:#E8760C">chevron_right</span>
+              </div>
+            </sc-if>
+
+            <!-- Status card -->
+            <div style="border-radius:24px;padding:30px 24px 26px;text-align:center;background:{{ statusCardBg }};border:1px solid {{ statusCardBorder }};transition:all .3s">
+              <div style="position:relative;width:104px;height:104px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center">
+                <div style="position:absolute;inset:0;border-radius:50%;background:{{ statusRing }}"></div>
+                <div style="position:relative;width:80px;height:80px;border-radius:26px;background:{{ statusIconBg }};display:flex;align-items:center;justify-content:center;transition:background .3s">
+                  <span class="msr" style="font-size:46px;color:#fff">{{ statusGlyph }}</span>
+                </div>
+              </div>
+              <div style="font-size:20px;font-weight:800;letter-spacing:-.01em;color:{{ statusTitleColor }}">{{ statusLabel }}</div>
+              <div style="font-size:13.5px;line-height:1.5;color:#5C666D;margin-top:6px;max-width:250px;margin-left:auto;margin-right:auto">{{ statusSub }}</div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:22px;padding:14px 16px;background:rgba(255,255,255,.72);border-radius:16px">
+                <div style="text-align:left"><div style="font-size:14.5px;font-weight:700">Protection</div><div style="font-size:12.5px;color:#5C666D;margin-top:1px">{{ protectionStateText }}</div></div>
+                <div onClick="{{ toggleProtection }}" style="flex:none;width:52px;height:31px;border-radius:16px;background:{{ toggleTrack }};padding:3px;cursor:pointer;transition:background .2s">
+                  <div style="width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transform:translateX({{ toggleShift }});transition:transform .2s"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats row -->
+            <div style="display:flex;gap:12px;margin-top:14px">
+              <div style="flex:1;border:1px solid #E7EAEC;border-radius:18px;padding:16px 16px 15px">
+                <span class="msr thin" style="font-size:22px;color:#0E7A55">block</span>
+                <div style="font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:6px;line-height:1">{{ threatCount }}</div>
+                <div style="font-size:12.5px;color:#5C666D;margin-top:3px">Menaces détectées</div>
+              </div>
+              <div style="flex:1;border:1px solid #E7EAEC;border-radius:18px;padding:16px 16px 15px">
+                <span class="msr thin" style="font-size:22px;color:#5C666D">schedule</span>
+                <div style="font-size:15px;font-weight:800;margin-top:6px;line-height:1.15">14:32</div>
+                <div style="font-size:12.5px;color:#5C666D;margin-top:3px">Dernière analyse</div>
+              </div>
+            </div>
+
+            <!-- Demo button -->
+            <button onClick="{{ openAlert }}" style="width:100%;height:54px;margin-top:14px;border:1.5px dashed #C9D0D3;border-radius:16px;background:#FBFCFC;color:#12181C;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px">
+              <span class="msr thin" style="font-size:20px;color:#5C666D">play_circle</span>Simuler un appel suspect
+            </button>
+            <div style="text-align:center;font-size:11.5px;color:#97A0A6;margin-top:8px">Mode démo — pour la présentation</div>
+          </div>
+        </sc-if>
+
+        <!-- ===== ALERTS LIST ===== -->
+        <sc-if value="{{ isAlerts }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;padding:16px 20px 24px;animation:wgScreenIn .35s ease">
+            <h1 style="margin:8px 4px 4px;font-size:26px;font-weight:800;letter-spacing:-.02em">Alertes</h1>
+            <p style="margin:0 4px 20px;font-size:14px;color:#5C666D">Historique des menaces détectées</p>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ history }}" as="a" hint-placeholder-count="3">
+                <div onClick="{{ a.open }}" style="display:flex;align-items:center;gap:14px;border:1px solid #E7EAEC;border-radius:18px;padding:15px 15px;cursor:pointer">
+                  <div style="flex:none;width:44px;height:44px;border-radius:13px;background:#F6F7F8;display:flex;align-items:center;justify-content:center"><span class="msr thin" style="font-size:23px;color:#12181C">{{ a.typeIcon }}</span></div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:14.5px;font-weight:700;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.title }}</div>
+                    <div style="font-size:12.5px;color:#5C666D;margin-top:3px">{{ a.type }} · {{ a.date }}</div>
+                  </div>
+                  <div style="flex:none;display:inline-flex;align-items:center;gap:5px;background:{{ a.badgeBg }};color:{{ a.badgeColor }};font-size:11.5px;font-weight:700;padding:5px 9px;border-radius:20px">
+                    <span class="msr" style="font-size:14px">{{ a.badgeIcon }}</span>{{ a.badgeLabel }}
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== ALERT DETAIL ===== -->
+        <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;padding:16px 20px 24px;animation:wgScreenIn .3s ease">
+            <div onClick="{{ backFromDetail }}" style="display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:#5C666D;cursor:pointer;padding:6px 4px;margin-bottom:12px"><span class="msr" style="font-size:20px">arrow_back</span>Alertes</div>
+            <sc-if value="{{ detailAlert }}" hint-placeholder-val="{{ false }}">
+              <div style="display:inline-flex;align-items:center;gap:6px;background:{{ detailAlert.riskColor }};color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.06em;padding:5px 11px;border-radius:20px;margin-bottom:14px"><span class="msr" style="font-size:14px">priority_high</span>RISQUE {{ detailAlert.risk }}</div>
+              <h1 style="margin:0 0 6px;font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.25">{{ detailAlert.title }}</h1>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:22px">
+                <span style="font-size:13px;color:#5C666D">{{ detailAlert.type }} · {{ detailAlert.date }}</span>
+                <span style="display:inline-flex;align-items:center;gap:5px;background:{{ detailAlert.badgeBg }};color:{{ detailAlert.badgeColor }};font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:20px"><span class="msr" style="font-size:13px">{{ detailAlert.badgeIcon }}</span>{{ detailAlert.badgeLabel }}</span>
+              </div>
+
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#97A0A6;margin-bottom:10px">POURQUOI CETTE DÉTECTION</div>
+              <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px">
+                <sc-for list="{{ detailAlert.triggers }}" as="t" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:flex-start;gap:11px;background:#FBFCFC;border:1px solid #EEF1F2;border-radius:14px;padding:13px 15px">
+                    <span class="msr" style="font-size:19px;color:#DC2626;margin-top:1px">error</span><span style="font-size:14px;font-weight:600;line-height:1.4">{{ t }}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#97A0A6;margin-bottom:10px">CONSEIL</div>
+              <div style="display:flex;align-items:flex-start;gap:12px;background:#E7F2EC;border:1px solid #CFE6DA;border-radius:16px;padding:16px">
+                <span class="msr" style="font-size:22px;color:#0E7A55">lightbulb</span>
+                <p style="margin:0;font-size:14px;line-height:1.5;color:#0B5E43;font-weight:500">{{ detailAlert.advice }}</p>
+              </div>
+
+              <button style="width:100%;height:50px;margin-top:20px;border:1px solid #E7EAEC;border-radius:15px;background:#fff;color:#12181C;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><span class="msr thin" style="font-size:20px;color:#0E7A55">group</span>Partager avec la communauté</button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ===== SETTINGS ===== -->
+        <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;padding:16px 20px 24px;animation:wgScreenIn .35s ease">
+            <h1 style="margin:8px 4px 20px;font-size:26px;font-weight:800;letter-spacing:-.02em">Paramètres</h1>
+
+            <sc-if value="{{ permMissing }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:flex-start;gap:12px;background:#FCEFE1;border:1px solid #F5D9BC;border-radius:16px;padding:14px 15px;margin-bottom:18px">
+                <span class="msr" style="font-size:22px;color:#E8760C">warning</span>
+                <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#8A4B04">Autorisation manquante</div><div style="font-size:12.5px;color:#8A4B04;line-height:1.4;margin-top:2px">Activez les autorisations ci-dessous pour une protection complète.</div></div>
+              </div>
+            </sc-if>
+
+            <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#97A0A6;margin:4px 0 10px">PROTECTION</div>
+            <div style="border:1px solid #E7EAEC;border-radius:18px;overflow:hidden;margin-bottom:22px">
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 16px;border-bottom:1px solid #F1F3F4">
+                <div style="flex:1"><div style="font-size:15px;font-weight:700">Mode de protection</div><div style="font-size:12.5px;color:#5C666D;margin-top:1px">{{ autoModeText }}</div></div>
+                <div onClick="{{ toggleAuto }}" style="flex:none;width:52px;height:31px;border-radius:16px;background:{{ autoTrack }};padding:3px;cursor:pointer;transition:background .2s"><div style="width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transform:translateX({{ autoShift }});transition:transform .2s"></div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 16px">
+                <div style="flex:1"><div style="font-size:15px;font-weight:700">Autoriser l'analyse</div><div style="font-size:12.5px;color:#5C666D;margin-top:1px">{{ analysisText }}</div></div>
+                <div onClick="{{ toggleAnalysis }}" style="flex:none;width:52px;height:31px;border-radius:16px;background:{{ analysisTrack }};padding:3px;cursor:pointer;transition:background .2s"><div style="width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transform:translateX({{ analysisShift }});transition:transform .2s"></div></div>
+              </div>
+            </div>
+
+            <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#97A0A6;margin:4px 0 10px">AUTORISATIONS</div>
+            <div style="border:1px solid #E7EAEC;border-radius:18px;overflow:hidden;margin-bottom:22px">
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 16px;border-bottom:1px solid #F1F3F4">
+                <span class="msr thin" style="font-size:22px;color:#12181C">mic</span>
+                <div style="flex:1;font-size:15px;font-weight:700">Microphone</div>
+                <div onClick="{{ toggleMic }}" style="flex:none;width:52px;height:31px;border-radius:16px;background:{{ micTrack }};padding:3px;cursor:pointer;transition:background .2s"><div style="width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transform:translateX({{ micShift }});transition:transform .2s"></div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 16px">
+                <span class="msr thin" style="font-size:22px;color:#12181C">layers</span>
+                <div style="flex:1;font-size:15px;font-weight:700">Superposition d'écran</div>
+                <div onClick="{{ toggleOverlay }}" style="flex:none;width:52px;height:31px;border-radius:16px;background:{{ overlayTrack }};padding:3px;cursor:pointer;transition:background .2s"><div style="width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transform:translateX({{ overlayShift }});transition:transform .2s"></div></div>
+              </div>
+            </div>
+
+            <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#97A0A6;margin:4px 0 10px">LANGUE</div>
+            <div style="display:flex;align-items:center;gap:14px;border:1px solid #E7EAEC;border-radius:18px;padding:16px 16px;cursor:pointer">
+              <span class="msr thin" style="font-size:22px;color:#12181C">translate</span>
+              <div style="flex:1;font-size:15px;font-weight:700">Langue</div>
+              <div style="display:flex;align-items:center;gap:4px;color:#5C666D;font-size:14px;font-weight:600">{{ lang }}<span class="msr" style="font-size:20px">expand_more</span></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== ABOUT ===== -->
+        <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;padding:16px 20px 24px;animation:wgScreenIn .35s ease">
+            <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 0 22px">
+              <div style="width:64px;height:64px;border-radius:20px;background:#0E7A55;display:flex;align-items:center;justify-content:center;margin-bottom:14px"><span class="msr" style="font-size:36px;color:#fff">verified_user</span></div>
+              <div style="font-size:19px;font-weight:800">WariGuard</div>
+              <div style="font-size:12.5px;color:#97A0A6;margin-top:2px">Version 1.0.0 · MVP</div>
+            </div>
+
+            <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#3D464C;text-align:center">WariGuard protège les utilisateurs de Mobile Money contre le phishing vocal et les arnaques par SMS. Notre mission : rendre chaque transaction plus sûre en Afrique de l'Ouest, en détectant les fraudes avant qu'elles ne coûtent de l'argent.</p>
+
+            <div style="border:1px solid #E7EAEC;border-radius:18px;overflow:hidden;margin-bottom:22px">
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 16px;border-bottom:1px solid #F1F3F4;cursor:pointer"><span class="msr thin" style="font-size:22px;color:#5C666D">shield</span><div style="flex:1;font-size:15px;font-weight:700">Politique de confidentialité</div><span class="msr" style="font-size:20px;color:#C0C7CB">chevron_right</span></div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 16px;cursor:pointer"><span class="msr thin" style="font-size:22px;color:#5C666D">support_agent</span><div style="flex:1;font-size:15px;font-weight:700">Contacter le support</div><span class="msr" style="font-size:20px;color:#C0C7CB">chevron_right</span></div>
+            </div>
+
+            <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#97A0A6;margin:4px 0 10px">QUESTIONS FRÉQUENTES</div>
+            <div style="border:1px solid #E7EAEC;border-radius:18px;overflow:hidden">
+              <div style="padding:16px 16px;border-bottom:1px solid #F1F3F4"><div style="font-size:14.5px;font-weight:700;margin-bottom:5px">WariGuard écoute-t-il mes appels ?</div><div style="font-size:13px;line-height:1.5;color:#5C666D">L'analyse se fait sur l'appareil, uniquement pendant un appel suspect. Aucun enregistrement n'est conservé.</div></div>
+              <div style="padding:16px 16px;border-bottom:1px solid #F1F3F4"><div style="font-size:14.5px;font-weight:700;margin-bottom:5px">Est-ce que ça fonctionne hors ligne ?</div><div style="font-size:13px;line-height:1.5;color:#5C666D">Oui, la détection des menaces les plus courantes fonctionne sans connexion internet.</div></div>
+              <div style="padding:16px 16px"><div style="font-size:14.5px;font-weight:700;margin-bottom:5px">Est-ce gratuit ?</div><div style="font-size:13px;line-height:1.5;color:#5C666D">La protection de base est entièrement gratuite pour tous les utilisateurs.</div></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- SCREENS_ANCHOR -->
+
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <sc-if value="{{ showApp }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;height:66px;border-top:1px solid #EEF1F2;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);display:flex;align-items:stretch;padding:0 6px 6px">
+          <div onClick="{{ goHome }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding-top:8px">
+            <span class="msr {{ navHomeFill }}" style="font-size:24px;color:{{ navHomeColor }}">home</span>
+            <span style="font-size:10.5px;font-weight:{{ navHomeWeight }};color:{{ navHomeColor }}">Accueil</span>
+          </div>
+          <div onClick="{{ goAlerts }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding-top:8px">
+            <span class="msr {{ navAlertsFill }}" style="font-size:24px;color:{{ navAlertsColor }}">notifications</span>
+            <span style="font-size:10.5px;font-weight:{{ navAlertsWeight }};color:{{ navAlertsColor }}">Alertes</span>
+          </div>
+          <div onClick="{{ goSettings }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding-top:8px">
+            <span class="msr {{ navSettingsFill }}" style="font-size:24px;color:{{ navSettingsColor }}">settings</span>
+            <span style="font-size:10.5px;font-weight:{{ navSettingsWeight }};color:{{ navSettingsColor }}">Paramètres</span>
+          </div>
+          <div onClick="{{ goAbout }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding-top:8px">
+            <span class="msr {{ navAboutFill }}" style="font-size:24px;color:{{ navAboutColor }}">info</span>
+            <span style="font-size:10.5px;font-weight:{{ navAboutWeight }};color:{{ navAboutColor }}">À propos</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ===== ALERT OVERLAY (écran roi) ===== -->
+      <sc-if value="{{ alertOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:30;background:rgba(15,18,20,.55);backdrop-filter:blur(3px);display:flex;flex-direction:column;justify-content:flex-end;animation:wgOverlayIn .2s ease">
+          <div style="position:relative;background:#fff;border-radius:30px 30px 0 0;padding:26px 22px calc(22px + env(safe-area-inset-bottom));animation:wgSheetIn .28s cubic-bezier(.2,.8,.2,1)">
+
+            <div onClick="{{ closeAlert }}" style="position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:#F1F3F4;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2"><span class="msr" style="font-size:20px;color:#5C666D">close</span></div>
+
+            <!-- Risk header -->
+            <div style="display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:22px">
+              <div style="width:72px;height:72px;border-radius:50%;background:#FDECEC;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+                <span class="msr" style="font-size:42px;color:#DC2626">gpp_bad</span>
+              </div>
+              <div style="display:inline-flex;align-items:center;gap:6px;background:#DC2626;color:#fff;font-size:12px;font-weight:800;letter-spacing:.08em;padding:6px 13px;border-radius:20px">
+                <span class="msr" style="font-size:15px">priority_high</span>RISQUE ÉLEVÉ
+              </div>
+              <h2 style="margin:14px 0 4px;font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.2">Arnaque probable détectée</h2>
+              <p style="margin:0;font-size:14px;color:#5C666D;font-weight:600">Appel en cours · « Agent Wave — vérification »</p>
+            </div>
+
+            <!-- Triggers -->
+            <div style="background:#FBFCFC;border:1px solid #EEF1F2;border-radius:18px;padding:8px 16px;margin-bottom:22px">
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #F1F3F4">
+                <span class="msr" style="font-size:20px;color:#DC2626">password</span><span style="font-size:14.5px;font-weight:600;line-height:1.3">Demande de code de confirmation</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #F1F3F4">
+                <span class="msr" style="font-size:20px;color:#DC2626">verified_off</span><span style="font-size:14.5px;font-weight:600;line-height:1.3">Usurpation d'un service officiel</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:11px 0">
+                <span class="msr" style="font-size:20px;color:#DC2626">error</span><span style="font-size:14.5px;font-weight:600;line-height:1.3">Insistance après votre refus</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <button onClick="{{ hangUp }}" style="width:100%;height:60px;border:none;border-radius:17px;background:#DC2626;color:#fff;font-family:inherit;font-size:17px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 20px -6px rgba(220,38,38,.5)">
+              <span class="msr" style="font-size:24px">call_end</span>Raccrocher
+            </button>
+            <button onClick="{{ report }}" style="width:100%;height:52px;margin-top:10px;border:none;border-radius:16px;background:#FCEFE1;color:#B85C05;font-family:inherit;font-size:15.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+              <span class="msr thin" style="font-size:20px">flag</span>Signaler cette arnaque
+            </button>
+            <button onClick="{{ ignoreAlert }}" style="width:100%;height:46px;margin-top:6px;border:none;background:transparent;color:#8A949B;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">Continuer l'appel</button>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    screen: 'welcome',      // welcome | permissions | app
+    tab: 'home',            // home | alerts | settings | about
+    detail: null,           // alert id
+    protection: true,
+    micGranted: true,
+    overlayGranted: true,
+    autoMode: true,
+    allowAnalysis: true,
+    lang: 'Français',
+    alertOpen: false,
+    history: [
+      { id: 3, type: 'Phishing vocal', typeIcon: 'call', title: 'Appel « Service client Orange »', date: "Aujourd'hui, 14:32", status: 'blocked', risk: 'ÉLEVÉ',
+        triggers: ['Demande de code PIN Mobile Money', 'Ton d\u2019urgence : « votre compte va être bloqué »', 'Numéro non enregistré dans vos contacts'],
+        advice: "Aucun opérateur ne vous demandera jamais votre code PIN par téléphone. Ne communiquez jamais ce code, même sous pression." },
+      { id: 2, type: 'Arnaque par SMS', typeIcon: 'sms', title: 'SMS « Vous avez gagné 500 000 FCFA »', date: "Hier, 19:08", status: 'reported', risk: 'ÉLEVÉ',
+        triggers: ['Lien raccourci suspect', 'Promesse de gain non sollicité', 'Demande de frais de déblocage'],
+        advice: "Ne cliquez sur aucun lien et ne versez aucun « frais ». Un gain légitime ne demande jamais de paiement préalable." },
+      { id: 1, type: 'Phishing vocal', typeIcon: 'call', title: 'Appel « Transfert reçu par erreur »', date: "6 juil., 11:20", status: 'ignored', risk: 'MOYEN',
+        triggers: ['Demande de renvoyer de l\u2019argent immédiatement', 'Pression émotionnelle'],
+        advice: "Vérifiez toujours un transfert entrant dans votre application avant d'agir. En cas de doute, raccrochez et rappelez le numéro officiel." }
+    ]
+  };
+
+  set(patch) { this.setState(patch); }
+  componentDidMount() { window.wgSet = (patch) => this.setState(patch); }
+
+  renderVals() {
+    const s = this.state;
+    const permMissing = !s.micGranted || !s.overlayGranted;
+    const protectionOn = s.protection && !permMissing;
+    const badge = (st) => st === 'blocked' ? { label: 'Bloqué', bg: '#E7F2EC', color: '#0B6E4F', icon: 'block' }
+      : st === 'reported' ? { label: 'Signalé', bg: '#FCEFE1', color: '#B85C05', icon: 'flag' }
+      : { label: 'Ignoré', bg: '#F1F3F4', color: '#5C666D', icon: 'remove_circle' };
+    const openDetail = (id) => this.set({ detail: id });
+    const historyView = s.history.map(h => {
+      const b = badge(h.status);
+      return { ...h, badgeLabel: b.label, badgeBg: b.bg, badgeColor: b.color, badgeIcon: b.icon,
+        riskColor: h.risk === 'ÉLEVÉ' ? '#DC2626' : '#E8760C',
+        open: () => openDetail(h.id) };
+    });
+    const da = s.history.find(h => h.id === s.detail) || null;
+    const detailAlert = da ? (() => { const b = badge(da.status); return { ...da, badgeLabel: b.label, badgeBg: b.bg, badgeColor: b.color, badgeIcon: b.icon, riskColor: da.risk === 'ÉLEVÉ' ? '#DC2626' : '#E8760C' }; })() : null;
+    return {
+      showWelcome: s.screen === 'welcome',
+      showPermissions: s.screen === 'permissions',
+      showApp: s.screen === 'app',
+
+      isHomeScreen: s.screen === 'app' && s.tab === 'home',
+      isHome: s.tab === 'home',
+      statusCardBg: protectionOn ? '#E7F2EC' : (permMissing ? '#FCEFE1' : '#F6F7F8'),
+      statusCardBorder: protectionOn ? '#CFE6DA' : (permMissing ? '#F5D9BC' : '#E7EAEC'),
+      statusRing: protectionOn ? '#D3E8DC' : (permMissing ? '#F7E0C8' : '#E4E8EA'),
+      statusIconBg: protectionOn ? '#0E7A55' : (permMissing ? '#E8760C' : '#98A0A6'),
+      statusGlyph: protectionOn ? 'verified_user' : (permMissing ? 'gpp_maybe' : 'gpp_bad'),
+      statusTitleColor: protectionOn ? '#0B5E43' : (permMissing ? '#8A4B04' : '#12181C'),
+      protectionStateText: s.protection ? 'Activée' : 'Désactivée',
+      toggleTrack: s.protection ? '#0E7A55' : '#D2D7DA',
+      toggleShift: s.protection ? '21px' : '0px',
+      isAlerts: s.tab === 'alerts' && !s.detail,
+      isDetail: s.tab === 'alerts' && !!s.detail,
+      isSettings: s.tab === 'settings',
+      isAbout: s.tab === 'about',
+      navHome: s.tab === 'home',
+      navAlerts: s.tab === 'alerts',
+      navSettings: s.tab === 'settings',
+      navAbout: s.tab === 'about',
+
+      protection: s.protection,
+      protectionOn,
+      statusLabel: protectionOn ? 'Protection active' : (permMissing ? 'Action requise' : 'Protection désactivée'),
+      statusSub: protectionOn ? 'WariGuard surveille vos appels et SMS en temps réel.' : (permMissing ? 'Autorisez les permissions pour être protégé.' : 'Vous n\u2019êtes pas protégé contre les arnaques.'),
+      threatCount: s.history.length,
+      lastScan: "Aujourd'hui, 14:32",
+      permMissing,
+      micGranted: s.micGranted,
+      overlayGranted: s.overlayGranted,
+
+      history: historyView,
+      detailAlert,
+      hasHistory: historyView.length > 0,
+
+      autoMode: s.autoMode,
+      allowAnalysis: s.allowAnalysis,
+      lang: s.lang,
+      autoModeText: s.autoMode ? 'Automatique — activé' : 'À la demande — désactivé',
+      autoTrack: s.autoMode ? '#0E7A55' : '#D2D7DA', autoShift: s.autoMode ? '21px' : '0px',
+      analysisText: s.allowAnalysis ? 'Activé' : 'Désactivé',
+      analysisTrack: s.allowAnalysis ? '#0E7A55' : '#D2D7DA', analysisShift: s.allowAnalysis ? '21px' : '0px',
+      micTrack: s.micGranted ? '#0E7A55' : '#D2D7DA', micShift: s.micGranted ? '21px' : '0px',
+      overlayTrack: s.overlayGranted ? '#0E7A55' : '#D2D7DA', overlayShift: s.overlayGranted ? '21px' : '0px',
+
+      alertOpen: s.alertOpen,
+
+      navHomeColor: s.tab==='home'?'#0E7A55':'#98A0A6', navHomeFill: s.tab==='home'?'':'thin', navHomeWeight: s.tab==='home'?700:600,
+      navAlertsColor: s.tab==='alerts'?'#0E7A55':'#98A0A6', navAlertsFill: s.tab==='alerts'?'':'thin', navAlertsWeight: s.tab==='alerts'?700:600,
+      navSettingsColor: s.tab==='settings'?'#0E7A55':'#98A0A6', navSettingsFill: s.tab==='settings'?'':'thin', navSettingsWeight: s.tab==='settings'?700:600,
+      navAboutColor: s.tab==='about'?'#0E7A55':'#98A0A6', navAboutFill: s.tab==='about'?'':'thin', navAboutWeight: s.tab==='about'?700:600,
+      goHome: () => this.set({ tab: 'home', detail: null }),
+      goAlerts: () => this.set({ tab: 'alerts', detail: null }),
+      goSettings: () => this.set({ tab: 'settings', detail: null }),
+      goAbout: () => this.set({ tab: 'about', detail: null }),
+
+      goPermissions: () => this.set({ screen: 'permissions' }),
+      grantPerms: () => this.set({ screen: 'app', micGranted: true, overlayGranted: true }),
+      skipPerms: () => this.set({ screen: 'app' }),
+      goTab: (t) => this.set({ tab: t, detail: null }),
+      openDetail: (id) => this.set({ detail: id }),
+      backFromDetail: () => this.set({ detail: null }),
+
+      toggleProtection: () => this.set({ protection: !s.protection }),
+      toggleMic: () => this.set({ micGranted: !s.micGranted }),
+      toggleOverlay: () => this.set({ overlayGranted: !s.overlayGranted }),
+      toggleAuto: () => this.set({ autoMode: !s.autoMode }),
+      toggleAnalysis: () => this.set({ allowAnalysis: !s.allowAnalysis }),
+      fixPermission: () => this.set({ tab: 'settings', detail: null }),
+
+      openAlert: () => this.set({ alertOpen: true }),
+      closeAlert: () => this.set({ alertOpen: false }),
+      hangUp: () => this.resolveAlert('blocked'),
+      report: () => this.resolveAlert('reported'),
+      ignoreAlert: () => this.resolveAlert('ignored'),
+
+      resolveAlert: (status) => {
+        const label = status === 'blocked' ? 'Appel raccroché' : (status === 'reported' ? 'Menace signalée' : 'Appel poursuivi');
+        const newAlert = {
+          id: Date.now(), type: 'Phishing vocal', typeIcon: 'call',
+          title: 'Appel « Agent Wave — vérification »', date: "À l'instant", status, risk: 'ÉLEVÉ',
+          triggers: ['Demande de code de confirmation', 'Usurpation d\u2019un service officiel', 'Insistance après refus'],
+          advice: "Ne partagez jamais un code reçu par SMS. Raccrochez et contactez le service via son numéro officiel."
+        };
+        this.setState({ alertOpen: false, tab: 'alerts', detail: null, history: [newAlert, ...this.state.history] });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

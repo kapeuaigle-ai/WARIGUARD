@@ -1,21 +1,21 @@
-/// Widgets partagés — style du prototype : cartes blanches à bord doux,
-/// badges pill, jauge, icône bouclier vert arrondi.
+/// Composants partagés — reprise du design system du prototype :
+/// cartes bordées, toggle à libellé, étiquette de section, chip bouclier.
 library;
-
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../models.dart';
 import '../theme.dart';
 
+/// Carte blanche bordée (rayon 18), brique de base du prototype.
 class WgCard extends StatelessWidget {
   const WgCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(18),
+    this.padding = const EdgeInsets.all(16),
     this.borderColor,
     this.color,
+    this.radius = 18,
     this.onTap,
   });
 
@@ -23,6 +23,7 @@ class WgCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final Color? borderColor;
   final Color? color;
+  final double radius;
   final VoidCallback? onTap;
 
   @override
@@ -30,8 +31,8 @@ class WgCard extends StatelessWidget {
     final card = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: color ?? Wg.surface,
-        borderRadius: BorderRadius.circular(Wg.radius),
+        color: color ?? Wg.bg,
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: borderColor ?? Wg.border),
       ),
       child: child,
@@ -41,108 +42,80 @@ class WgCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(Wg.radius),
+        borderRadius: BorderRadius.circular(radius),
         child: card,
       ),
     );
   }
 }
 
+/// Étiquette de section en capitales (PROTECTION, AUTORISATIONS…).
 class SectionLabel extends StatelessWidget {
-  const SectionLabel(this.text, {super.key});
+  const SectionLabel(this.text, {super.key, this.padding});
 
   final String text;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Text(text.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall),
+        padding: padding ?? const EdgeInsets.only(bottom: 10, left: 2),
+        child: Text(
+          text.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.9,
+            color: Wg.textFaint,
+          ),
+        ),
       );
 }
 
-/// Badge pill plein, comme « ! RISQUE ÉLEVÉ » du prototype.
-class RiskBadge extends StatelessWidget {
-  const RiskBadge(this.level, {super.key, this.compact = false});
+/// Interrupteur du prototype (piste 52×31, pastille 25) + libellé texte.
+class WgToggle extends StatelessWidget {
+  const WgToggle({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    this.semanticLabel,
+  });
 
-  final RiskLevel level;
-  final bool compact;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
-    final color = Wg.riskColor(level);
-    return Container(
-      padding: EdgeInsets.symmetric(
-          horizontal: compact ? 10 : 14, vertical: compact ? 4 : 7),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            level == RiskLevel.vert
-                ? Icons.check_rounded
-                : Icons.priority_high_rounded,
-            size: compact ? 11 : 13,
-            color: Colors.white,
-          ),
-          const SizedBox(width: 5),
-          Text(
-            Wg.riskLabel(level),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: compact ? 10 : 12,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
-            ),
-          ),
-        ],
-      ),
+    return Semantics(
+      label: semanticLabel,
+      toggled: value,
+      child: _buildSwitch(),
     );
   }
-}
 
-/// Jauge semi-circulaire du score de risque.
-class RiskGauge extends StatelessWidget {
-  const RiskGauge({super.key, required this.score, required this.level, this.size = 168});
-
-  final double score;
-  final RiskLevel level;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: score),
-      duration: const Duration(milliseconds: 900),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, _) => SizedBox(
-        width: size,
-        height: size * 0.62,
-        child: CustomPaint(
-          painter: _GaugePainter(value: value, color: Wg.riskColor(level)),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('${(value * 100).round()}',
-                    style: TextStyle(
-                      fontSize: size * 0.21,
-                      fontWeight: FontWeight.w800,
-                      color: Wg.riskColor(level),
-                      height: 1,
-                    )),
-                Text('SCORE DE RISQUE / 100',
-                    style: TextStyle(
-                        fontSize: size * 0.05,
-                        letterSpacing: 1.6,
-                        color: Wg.textFaint,
-                        fontWeight: FontWeight.w700)),
-                const SizedBox(height: 2),
-              ],
+  Widget _buildSwitch() {
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: 52,
+        height: 31,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: value ? Wg.green : Wg.trackOff,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            width: 25,
+            height: 25,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [BoxShadow(color: Color(0x33000000), blurRadius: 3, offset: Offset(0, 1))],
             ),
           ),
         ),
@@ -151,102 +124,147 @@ class RiskGauge extends StatelessWidget {
   }
 }
 
-class _GaugePainter extends CustomPainter {
-  _GaugePainter({required this.value, required this.color});
-
-  final double value;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height - 4);
-    final radius = math.min(size.width / 2, size.height) - 6;
-    const start = math.pi;
-    const sweep = math.pi;
-
-    final track = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 12
-      ..strokeCap = StrokeCap.round
-      ..color = Wg.surfaceAlt;
-    canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius), start, sweep, false, track);
-
-    final arc = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 12
-      ..strokeCap = StrokeCap.round
-      ..color = color;
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), start,
-        sweep * value.clamp(0.001, 1.0), false, arc);
-
-    for (final t in [0.35, 0.65]) {
-      final angle = start + sweep * t;
-      final p1 = center + Offset(math.cos(angle), math.sin(angle)) * (radius - 12);
-      final p2 = center + Offset(math.cos(angle), math.sin(angle)) * (radius + 8);
-      canvas.drawLine(
-          p1,
-          p2,
-          Paint()
-            ..color = Wg.borderStrong
-            ..strokeWidth = 1.5);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_GaugePainter old) => old.value != value || old.color != color;
-}
-
-/// Carte statistique du prototype : pastille d'icône, grand chiffre, libellé.
-class StatTile extends StatelessWidget {
-  const StatTile({
+/// Ligne « libellé + sous-texte + toggle » (Paramètres, carte d'état).
+class ToggleRow extends StatelessWidget {
+  const ToggleRow({
     super.key,
+    required this.title,
+    required this.subtitle,
     required this.value,
-    required this.label,
-    this.icon = Icons.shield_rounded,
-    this.accent = Wg.green,
+    required this.onChanged,
+    this.leading,
   });
 
-  final String value;
-  final String label;
-  final IconData icon;
-  final Color accent;
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final IconData? leading;
 
   @override
   Widget build(BuildContext context) {
-    return WgCard(
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 16, color: accent),
+    return Row(
+      children: [
+        if (leading != null) ...[
+          Icon(leading, size: 22, color: Wg.text),
+          const SizedBox(width: 14),
+        ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+              if (subtitle.isNotEmpty) ...[
+                const SizedBox(height: 1),
+                Text(subtitle,
+                    style: const TextStyle(fontSize: 12.5, color: Wg.textDim)),
+              ],
+            ],
           ),
-          const SizedBox(height: 10),
-          Text(value,
-              style: const TextStyle(
-                  fontSize: 22, fontWeight: FontWeight.w800, color: Wg.text)),
-          const SizedBox(height: 2),
-          Text(label,
-              style: const TextStyle(
-                  fontSize: 11.5,
-                  color: Wg.textDim,
-                  fontWeight: FontWeight.w600)),
+        ),
+        WgToggle(value: value, onChanged: onChanged, semanticLabel: title),
+      ],
+    );
+  }
+}
+
+/// Chip du bouclier ayant détecté la menace — « Bouclier Texte » / « Lien ».
+class ShieldChip extends StatelessWidget {
+  const ShieldChip(this.shield, {super.key, this.tone = Wg.green});
+
+  final Shield shield;
+  final Color tone;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: tone.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(shield.icon, size: 15, color: tone),
+          const SizedBox(width: 6),
+          Text(shield.label,
+              style: TextStyle(
+                  fontSize: 12, fontWeight: FontWeight.w700, color: tone)),
         ],
       ),
     );
   }
 }
 
-/// Icône bouclier : carré arrondi vert, bouclier blanc (logo du prototype).
+/// Badge de statut d'alerte (Bloqué / Signalé / Ignoré).
+class StatusBadge extends StatelessWidget {
+  const StatusBadge(this.status, {super.key});
+
+  final AlertStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final (bg, fg) = switch (status) {
+      AlertStatus.blocked => (Wg.greenTint, Wg.greenBadge),
+      AlertStatus.reported => (Wg.orangeTint, Wg.orangeDeep),
+      AlertStatus.ignored => (Wg.borderSoft, Wg.textDim),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(status.icon, size: 14, color: fg),
+          const SizedBox(width: 5),
+          Text(status.label,
+              style: TextStyle(
+                  fontSize: 11.5, fontWeight: FontWeight.w700, color: fg)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pastille de risque « RISQUE ÉLEVÉ / MOYEN ».
+class RiskPill extends StatelessWidget {
+  const RiskPill(this.level, {super.key});
+
+  final RiskLevel level;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Wg.riskColor(level);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(20)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+              level == RiskLevel.vert
+                  ? Icons.check_rounded
+                  : Icons.priority_high_rounded,
+              size: 14,
+              color: Colors.white),
+          const SizedBox(width: 4),
+          Text('RISQUE ${Wg.riskWord(level)}',
+              style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6,
+                  color: Colors.white)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Petit logo bouclier (carré arrondi vert, icône blanche).
 class ShieldMark extends StatelessWidget {
-  const ShieldMark({super.key, this.size = 34, this.color = Wg.green});
+  const ShieldMark({super.key, this.size = 28, this.color = Wg.green});
 
   final double size;
   final Color color;
@@ -258,37 +276,38 @@ class ShieldMark extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(size * 0.3),
+        borderRadius: BorderRadius.circular(size * 0.31),
       ),
       child: Icon(Icons.verified_user_rounded,
-          size: size * 0.55, color: Colors.white),
+          size: size * 0.6, color: Colors.white),
     );
   }
 }
 
-/// Pastille circulaire teintée avec icône (permissions, alertes du prototype).
+/// Pastille d'icône teintée (permissions, en-têtes).
 class IconBubble extends StatelessWidget {
   const IconBubble({
     super.key,
     required this.icon,
     this.color = Wg.green,
-    this.size = 56,
+    this.bg = Wg.greenTint,
+    this.size = 52,
+    this.radius = 15,
   });
 
   final IconData icon;
   final Color color;
+  final Color bg;
   final double size;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(size * 0.3),
-      ),
-      child: Icon(icon, size: size * 0.45, color: color),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(radius)),
+      child: Icon(icon, size: size * 0.5, color: color),
     );
   }
 }

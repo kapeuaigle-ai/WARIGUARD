@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/onboarding_screen.dart';
+import 'screens/permissions_screen.dart';
 import 'screens/shell.dart';
+import 'screens/welcome_screen.dart';
 import 'services/app_state.dart';
 import 'theme.dart';
 import 'widgets/common.dart';
@@ -23,7 +24,7 @@ class WariGuardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WariGuard — Bouclier Mobile Money',
+      title: 'WariGuard',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
       home: const _Root(),
@@ -31,48 +32,124 @@ class WariGuardApp extends StatelessWidget {
   }
 }
 
-class _Root extends StatelessWidget {
+class _Root extends StatefulWidget {
   const _Root();
+
+  @override
+  State<_Root> createState() => _RootState();
+}
+
+class _RootState extends State<_Root> {
+  bool _permissionsStep = false;
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     if (!state.ready) return const _Splash();
 
-    // Cadre « téléphone » centré sur grand écran, plein écran sur mobile.
-    final child = state.consent.onboarded ? const AppShell() : const OnboardingScreen();
+    Widget child;
+    if (state.settings.onboarded) {
+      child = const AppShell();
+    } else if (_permissionsStep) {
+      child = const Scaffold(backgroundColor: Wg.bg, body: PermissionsScreen());
+    } else {
+      child = Scaffold(
+        backgroundColor: Wg.bg,
+        body: SafeArea(
+          child: WelcomeScreen(
+              onContinue: () => setState(() => _permissionsStep = true)),
+        ),
+      );
+    }
+
+    return _PhoneFrame(child: child);
+  }
+}
+
+/// Cadre téléphone sur grand écran (384×832, comme le prototype), plein écran
+/// sur mobile. La barre d'état factice n'apparaît que dans le cadre.
+class _PhoneFrame extends StatelessWidget {
+  const _PhoneFrame({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 560) return child;
         return ColoredBox(
-          color: const Color(0xFFECEDEE),
+          color: Wg.stage,
           child: Center(
             child: Container(
-              width: 430,
-              height: constraints.maxHeight.clamp(0, 900).toDouble(),
-              margin: const EdgeInsets.symmetric(vertical: 24),
-              clipBehavior: Clip.antiAlias,
+              width: 384,
+              height: 832,
+              padding: const EdgeInsets.all(11),
               decoration: BoxDecoration(
-                color: const Color(0xFF111315),
-                borderRadius: BorderRadius.circular(54),
+                color: Wg.device,
+                borderRadius: BorderRadius.circular(46),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.18),
-                    blurRadius: 60,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 18),
+                    color: const Color(0xFF101814).withValues(alpha: 0.34),
+                    blurRadius: 80,
+                    spreadRadius: -24,
+                    offset: const Offset(0, 40),
                   ),
                 ],
               ),
-              padding: const EdgeInsets.all(12),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(42),
-                child: child,
+                borderRadius: BorderRadius.circular(36),
+                child: Material(
+                  color: Wg.bg,
+                  child: Column(
+                    children: [
+                      const _StatusBar(),
+                      Expanded(
+                        child: MediaQuery.removePadding(
+                          context: context,
+                          removeTop: true,
+                          child: child,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _StatusBar extends StatelessWidget {
+  const _StatusBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 40,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(26, 0, 24, 0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('9:41',
+                style: TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w700, color: Wg.text)),
+            Row(
+              children: [
+                Icon(Icons.signal_cellular_alt_rounded, size: 16, color: Wg.text),
+                SizedBox(width: 6),
+                Icon(Icons.wifi_rounded, size: 16, color: Wg.text),
+                SizedBox(width: 6),
+                Icon(Icons.battery_full_rounded, size: 18, color: Wg.text),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -84,23 +161,7 @@ class _Splash extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Wg.bg,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ShieldMark(size: 72),
-            SizedBox(height: 20),
-            Text('WARIGUARD',
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 2.5,
-                    color: Wg.green)),
-            SizedBox(height: 8),
-            Text('Chargement du bouclier…', style: TextStyle(color: Wg.textDim)),
-          ],
-        ),
-      ),
+      body: Center(child: ShieldMark(size: 64)),
     );
   }
 }
